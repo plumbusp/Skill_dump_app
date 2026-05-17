@@ -1,6 +1,6 @@
-## Skill dump 
-Learn somethings new eveyday, by forget with time? That application is the solution
-# Upcoming features:
+# Skill dump 
+Learn somethings new eveyday, but forget with time? That application is the solution
+## Upcoming features:
 - Users can create an account and log in to the "Skill Dump" application.
 - They can add entries about new skills or knowledge to the application and label them in a certain category when creating them. They can also edit and delete their own entries.
 - Users can view their skill history and track which areas they have developed the most. The application offers private skill storage for each user and a public dashboard displaying ideas on which skills are important and why. Users can view their own private entries and the public entries of others.
