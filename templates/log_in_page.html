@@ -1,0 +1,15 @@
+<p>LOG IN</p>
+<form action="/log_in" method="POST">
+    <label for = "username">Username:</label><br>
+    <input type="text" name="username"><br>
+    <label>Password:</label><br>
+    <input type="password" name="password"><br>
+    {% if not valid_login %}
+        <p>Invalid username or password! Try again</p>
+    {% endif %}
+    <button>Log in</button> <br>
+</form>
+
+<form action="/sign_up_page" method="GET">
+    <button name= "SIGN_UP">Don't have an account? Sign up</button> <br>
+</form>

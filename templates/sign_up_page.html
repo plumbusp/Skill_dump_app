@@ -1,0 +1,15 @@
+<p>SIGN UP</p>
+<form action="/sign_up" method="POST">
+    <label for = "username">Username:</label><br>
+    <input type="text" name="username"><br>
+    <label>Password:</label><br>
+    <input type="password" name="password"><br>
+    {% if already_exists %}
+        <p>User already exists! Log in</p>
+    {% endif %}
+    <button>Sign up</button> <br>
+</form>
+
+<form action="log_in_page" method="GET">
+    <button name= "LOG_IN">Already have an account? Log in</button> <br>
+</form>
