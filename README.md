@@ -18,6 +18,6 @@ Learn somethings new eveyday, but forget with time? That application is the solu
 
 ## How to test:
 - Install python and flask. If flask is not installed: pip install flask
-- run the application and go to the  http://127.0.0.1:5000
+- run the application suing 'flask run' command and go to the  http://127.0.0.1:5000
   
 
