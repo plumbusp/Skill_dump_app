@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html>
 <body>
-  <h1>Hello {{session.username}}!</h1>
-  <p>
-    Here is your private ideas page. You can write your thoughts here,
-     and they will be visible only to you. <br>
-    <form action="/add_private_idea" method="POST">
-        <label for = "idea">Write your idea here:</label><br>
-        <input type="text" name="idea"><br>
-        <button>Add idea</button> <br>
-    </form>
-    Here are your private ideas: <br>
-    {% for idea in ideas %}
-        <p>{{idea["title"]}}</p>
-    {% endfor %}
-  </p>
+    {% if session.username %}
+    <h1>Hello {{session.username}}!</h1>
+    <p>
+        Here is your private ideas page. You can write your thoughts here,
+        and they will be visible only to you. <br>
+        <form action="/add_private_idea" method="POST">
+            <label for = "idea">Write your idea here:</label><br>
+            <input type="text" name="idea"><br>
+            <button>Add idea</button> <br>
+        </form>
+        Here are your private ideas: <br>
+        {% for idea in ideas %}
+            <p>{{idea["title"]}}</p>
+              <p>
+                <a href="/edit/{{ idea.id }}">Edit</a> |
+                <a href="/remove/{{ idea.id }}">Delete</a>
+            </p>
+        {% endfor %}
+    </p>
+    {% else %}
+        <p>You are not logged in! Please log in to see your private ideas.</p>
+    {% endif %}
 </body>
 </html>

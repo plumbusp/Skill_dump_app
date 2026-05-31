@@ -13,3 +13,9 @@ def add_private_idea(idea: str):
     if not session["user_id"]:
         return "NO USER ID"
     db.execute("INSERT INTO ideas (title, user_id) VALUES (?,?)",[idea, session["user_id"]])
+
+def get_idea(idea_id):
+    return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
+
+def update_idea(idea_id:int, content:str):
+    db.execute("UPDATE ideas SET title = ? WHERE id = ?", [content, idea_id])

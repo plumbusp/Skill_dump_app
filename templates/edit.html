@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <form action="/edit/{{ idea.id }}" method="post">
+    <p>
+      Viesti:<br />
+      <textarea name="content" rows="5" cols="40">{{ idea.title }}</textarea>
+    </p>
+    <input type="submit" value="Submit!" />
+  </form>
+</body>
+</html>

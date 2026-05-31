@@ -88,6 +88,18 @@ def add_private_idead():
     private_ideas.add_private_idea(request.form["idea"])
     return redirect("/to_private_ideas")
 
+@app.route("/edit/<int:idea_id>", methods=["GET", "POST"])
+def edit_idea(idea_id):
+    idea = private_ideas.get_idea(idea_id)
+
+    if request.method == "GET":
+        return render_template("edit.html", idea=idea)
+
+    if request.method == "POST":
+        content = request.form["content"]
+        private_ideas.update_idea(idea["id"], content)
+        return redirect("/to_private_ideas")
+    return "what is it then?? ERROR!"
 
 
 print(__name__)
