@@ -19,3 +19,6 @@ def get_idea(idea_id):
 
 def update_idea(idea_id:int, content:str):
     db.execute("UPDATE ideas SET title = ? WHERE id = ?", [content, idea_id])
+
+def remove_idea(idea_id:int):
+    db.execute("DELETE FROM ideas WHERE id = ?", [idea_id])

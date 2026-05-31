@@ -85,7 +85,11 @@ def show_private_ideas():
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_private_idead():
-    private_ideas.add_private_idea(request.form["idea"])
+    idea = request.form["idea"]
+    if idea.strip() == "":
+        return redirect("/to_private_ideas")
+
+    private_ideas.add_private_idea(idea)
     return redirect("/to_private_ideas")
 
 @app.route("/edit/<int:idea_id>", methods=["GET", "POST"])
@@ -99,6 +103,21 @@ def edit_idea(idea_id):
         content = request.form["content"]
         private_ideas.update_idea(idea["id"], content)
         return redirect("/to_private_ideas")
+    return "what is it then?? ERROR!"
+
+
+@app.route("/remove/<int:idea_id>", methods=["GET","POST"])
+def remove_message(idea_id):
+    idea = private_ideas.get_idea(idea_id)
+
+    if request.method == "GET":
+        return render_template("remove.html", idea=idea)
+
+    if request.method == "POST":
+        if "continue" in request.form:
+            private_ideas.remove_idea(idea["id"])
+        return redirect("/to_private_ideas")
+    
     return "what is it then?? ERROR!"
 
 
