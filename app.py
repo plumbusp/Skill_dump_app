@@ -23,14 +23,16 @@ def sign_up():
     password_hash = generate_password_hash(password1)
 
     try:
-        sql = "INSERT INTO log_in_info (username, password) VALUES (?, ?)"
+        sql = "INSERT INTO log_in_info (usernames, passwords) VALUES (?, ?)"
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError:
         return render_template("sign_up_page.html", already_exists= True)
 
     # succesfull sign up
-    session["test"] = "lil lol"
+    #SESSION
     session["username"] = username
+    session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
+
     return render_template("log_in_page.html")
 
 @app.route("/")
@@ -45,7 +47,7 @@ def log_in():
     print("Username ", username)
     print("Password ", password)
 
-    result = db.query("SELECT username, password FROM log_in_info WHERE username=?", (username ,))
+    result = db.query("SELECT usernames, passwords FROM log_in_info WHERE usernames=?", (username ,))
     print(f"Result { result[0][0]} { result[0][1]}")
     if not password:
         print(" not password")
@@ -54,7 +56,11 @@ def log_in():
     if check_password_hash(result[0][1],password):
         # log in
         print("right password")
+        #SESSION
         session["username"] = username
+        session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
+        print("user id ", session["user_id"])
+
         return render_template("log_in_page.html")
     else: 
         print("Invalid password")
@@ -64,16 +70,18 @@ def log_out():
     session.clear()
     return render_template("log_in_page.html",valid_login=True)
 
-
-
 @app.route("/log_in_page")
 def log_in_page():
     return render_template("log_in_page.html",valid_login=True)
 
-
 @app.route("/<int:page_id>")
 def page(page_id):
     return "Tämä on sivu " + str(page_id)
+
+@app.route("/to_private_ideas")
+def show_private_ideas():
+    return render_template("private_ideas.html")
+
 
 
 print(__name__)
