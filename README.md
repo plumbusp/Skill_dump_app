@@ -16,3 +16,8 @@ Learn somethings new eveyday, but forget with time? That application is the solu
 - Users can assign one or more labels to a skill. Available labels are stored in the database.
 - Users can add comments to their own skills, as well as to others' skills on the public dashboard.
 
+## How to test:
+- Install python and flask. If flask is not installed: pip install flask
+- run the application and go to the  http://127.0.0.1:5000
+  
+
