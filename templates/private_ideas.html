@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html>
 <body>
-  <h1>This is the initial page</h1>
+  <h1>Hello {{session.username}}!</h1>
   <p>
-    {{session.user_id}}
+    Here is your private ideas page. You can write your thoughts here,
+     and they will be visible only to you. <br>
+    <form action="/add_private_idea" method="POST">
+        <label for = "idea">Write your idea here:</label><br>
+        <input type="text" name="idea"><br>
+        <button>Add idea</button> <br>
+    </form>
+    Here are your private ideas: <br>
+    {% for idea in ideas %}
+        <p>{{idea["title"]}}</p>
+    {% endfor %}
   </p>
 </body>
 </html>

@@ -4,6 +4,7 @@ from flask import redirect, render_template, request
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
+import private_ideas
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -80,7 +81,12 @@ def page(page_id):
 
 @app.route("/to_private_ideas")
 def show_private_ideas():
-    return render_template("private_ideas.html")
+    return private_ideas.get_private_ideas()
+
+@app.route("/add_private_idea", methods=["POST"])
+def add_private_idead():
+    private_ideas.add_private_idea(request.form["idea"])
+    return redirect("/to_private_ideas")
 
 
 
