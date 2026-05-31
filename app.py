@@ -1,34 +1,36 @@
-from flask import Flask, render_template, request
 import sqlite3
-import datetime
+from flask import Flask
+from flask import redirect, render_template, request
+from werkzeug.security import generate_password_hash
+import config
+import db
 
 app = Flask(__name__)
+
+@app.route("/sign_up_page")
+def sign_up_page():
+    return render_template("sign_up_page.html")
+
+@app.route("/sign_up", methods=["POST"])
+def sign_up():
+    username = request.form["username"]
+    password1 = request.form["password1"]
+    password2 = request.form["password2"]
+    if password1 != password2:
+        return "Passwords don't match!"
+    password_hash = generate_password_hash(password1)
+
+    try:
+        sql = "INSERT INTO log_in_info (username, password) VALUES (?, ?)"
+        db.execute(sql, [username, password_hash])
+    except sqlite3.IntegrityError:
+        return render_template("sign_up_page.html", already_exists= True)
+
+    return render_template("user_home.html")
 
 @app.route("/")
 def index():
     return render_template("typical_page_no_log_in.html")
-
-@app.route("/sign_up", methods=["POST"])
-def sign_up():
-    connection = create_db()
-    cursor = connection.cursor()
-    username = request.form.get("username") # getting a name form the submitted form
-    password = request.form.get("password")
-    result = cursor.execute("SELECT 1 FROM log_in_info WHERE username = ?", (username,))
-    connection.commit()
-    
-    # checking if username exists
-    list_of_tuples = result.fetchall()
-    print(list_of_tuples)
-    if list_of_tuples == []:
-        print("Inserting ",  (username, password))
-        cursor.execute("INSERT INTO log_in_info VALUES (?,?)", (username, password))
-        connection.commit()
-    else:
-        print("Already exists")
-        return render_template("sign_up_page.html", already_exists=True)
-
-    return "!"
 
 @app.route("/log_in", methods=["POST"])
 def log_in():
@@ -50,10 +52,6 @@ def log_in():
     else:
         return "!!"
 
-
-@app.route("/sign_up_page")
-def sign_up_page():
-    return render_template("sign_up_page.html")
 
 @app.route("/log_in_page")
 def log_in_page():
