@@ -1,15 +1,17 @@
 import sqlite3
-from flask import Flask
+from flask import Flask, session
 from flask import redirect, render_template, request
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 
 app = Flask(__name__)
+app.secret_key = config.secret_key
+initialized = False
 
 @app.route("/sign_up_page")
 def sign_up_page():
-    return render_template("sign_up_page.html")
+    return render_template("sign_up_page.html", passwords_match = True)
 
 @app.route("/sign_up", methods=["POST"])
 def sign_up():
@@ -17,7 +19,7 @@ def sign_up():
     password1 = request.form["password1"]
     password2 = request.form["password2"]
     if password1 != password2:
-        return "Passwords don't match!"
+        return render_template("sign_up_page.html", passwords_match = False)
     password_hash = generate_password_hash(password1)
 
     try:
@@ -26,31 +28,42 @@ def sign_up():
     except sqlite3.IntegrityError:
         return render_template("sign_up_page.html", already_exists= True)
 
-    return render_template("user_home.html")
+    # succesfull sign up
+    session["test"] = "lil lol"
+    session["username"] = username
+    return render_template("log_in_page.html")
 
 @app.route("/")
 def index():
+    print(session.get("test"))
     return render_template("typical_page_no_log_in.html")
 
 @app.route("/log_in", methods=["POST"])
 def log_in():
-    connection = create_db()
-    cursor = connection.cursor()
     username = request.form.get("username") # getting a name form the submitted form
     password = request.form.get("password")
     print("Username ", username)
-    print("Passwro ", password)
+    print("Password ", password)
 
-    result = cursor.execute("SELECT username, password FROM log_in_info WHERE username=?", (username ,))
-    connection.commit()
-    row = result.fetchall()
-    print("ROW",row)
+    result = db.query("SELECT username, password FROM log_in_info WHERE username=?", (username ,))
+    print(f"Result { result[0][0]} { result[0][1]}")
+    if not password:
+        print(" not password")
+        return render_template("log_in_page.html",valid_login=False)
+       
+    if check_password_hash(result[0][1],password):
+        # log in
+        print("right password")
+        session["username"] = username
+        return render_template("log_in_page.html")
+    else: 
+        print("Invalid password")
+        return render_template("log_in_page.html",valid_login=False)
+@app.route("/logout")
+def log_out():
+    session.clear()
+    return render_template("log_in_page.html",valid_login=True)
 
-    if row == [] or password != row[0][1]:
-        print("Wrong Password")
-        return render_template("log_in_page.html", valid_login=False)
-    else:
-        return "!!"
 
 
 @app.route("/log_in_page")
@@ -62,16 +75,5 @@ def log_in_page():
 def page(page_id):
     return "Tämä on sivu " + str(page_id)
 
-def create_db()-> sqlite3.Connection:
-    """Creates a database if doens't exists. Returns connection onject"""
-    connection_obj = sqlite3.connect("database.sqlite")
-    connection_obj.execute("""
-        CREATE TABLE IF NOT EXISTS log_in_info (
-            username varchar(50) PRIMARY KEY,
-            password varchar(10)
-        );
-                                """)
-    return connection_obj
-    
 
 print(__name__)

@@ -8,6 +8,8 @@
     <input type="password" name="password2" /></p>
     {% if already_exists %}
         <p>User already exists! Log in</p>
+    {% elif not passwords_match %}
+        <p>Passwords don't match! </p>
     {% endif %}
     <button>Sign up</button> <br>
 </form>
