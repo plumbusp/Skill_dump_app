@@ -14,7 +14,7 @@ def add_private_idea(idea: str):
         return "NO USER ID"
     db.execute("INSERT INTO ideas (title, user_id) VALUES (?,?)",[idea, session["user_id"]])
 
-def get_idea(idea_id):
+def get_idea(idea_id)-> list:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
 
 def update_idea(idea_id:int, content:str):
@@ -22,3 +22,6 @@ def update_idea(idea_id:int, content:str):
 
 def remove_idea(idea_id:int):
     db.execute("DELETE FROM ideas WHERE id = ?", [idea_id])
+
+def find_matches(keyword:str)-> list:
+    return db.query("SELECT * FROM ideas WHERE title LIKE ? AND user_id = ?", [f"%{keyword}%", session["user_id"]])

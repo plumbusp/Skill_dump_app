@@ -120,5 +120,13 @@ def remove_message(idea_id):
     
     return "what is it then?? ERROR!"
 
+@app.route("/search_private_ideas", methods =["GET"])
+def search_private_ideas():
+    keyword =request.args.get("keyword")
+    if not keyword:
+        return redirect("/to_private_ideas")
+    matches = private_ideas.find_matches(keyword)
+    print(matches)
+    return render_template("private_ideas.html", ideas=matches)
 
 print(__name__)
