@@ -9,10 +9,10 @@ def get_private_ideas() -> str:
     ideas = db.query("SELECT * FROM ideas WHERE user_id = ?", [session["user_id"]])
     return render_template("private_ideas.html", ideas=ideas)
 
-def add_private_idea(idea: str):
+def add_private_idea(idea: str, content:str):
     if not session["user_id"]:
         return "NO USER ID"
-    db.execute("INSERT INTO ideas (title, user_id) VALUES (?,?)",[idea, session["user_id"]])
+    db.execute("INSERT INTO ideas (title, content, user_id) VALUES (?,?,?)",[idea, content, session["user_id"]])
 
 def get_idea(idea_id)-> list:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]

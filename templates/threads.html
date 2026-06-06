@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+    {% if session.username %}
+        <form action="/create_thread" method="post"> 
+            <label for="create_thread"> Create thread </label>
+            <input type="text" name="title_of_new_thread">
+            <p>Write your message here:</p>
+            <textarea rows="4" cols="40" name="initial_message"></textarea><br>
+            <button>Create thread</button>
+        </form>
+        {% for thread in threads%}
+            <a href="/thread/{{thread.title}}"><b>{{thread.title}}</b></a>
+            <p> There are total of {{thread.total}} messages in this thread.</p>
+            <hr />
+        {% endfor %}
+        <p></p>
+    {% else %}
+        <p>You are not logged in! Please log in to see threads.</p>
+        <input type="button" value="Log in" action="/">
+    {% endif %}
+</body>
+</html>

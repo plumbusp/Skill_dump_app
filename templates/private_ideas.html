@@ -13,12 +13,16 @@
         </form>
         <form action="/add_private_idea" method="POST">
             <label for = "idea">Write your idea here:</label><br>
+            <p>Title:</p>
             <input type="text" name="idea"><br>
+            <p>Content:</p>
+            <textarea rows="4" cols="40" name="content"></textarea><br>
             <button>Add idea</button> <br>
         </form>
         Here are your private ideas: <br>
         {% for idea in ideas %}
-            <p>{{idea["title"]}}</p>
+            <p><b>{{idea["title"]}}</b></p>
+            <p>{{idea["content"]}}</p>
               <p>
                 <a href="/edit/{{ idea.id }}">Edit</a> |
                 <a href="/remove/{{ idea.id }}">Delete</a>
@@ -30,3 +34,4 @@
     {% endif %}
 </body>
 </html>
+

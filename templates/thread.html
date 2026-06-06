@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+    {% if session.user_id %}
+        <h1> {{title_of_thread}}</h1>
+        {% for message in messages %}
+            <p>
+                {{ message.username }} ({{ message.sent_at }}):
+            </p>
+            <p>
+                {{ message.content }}
+            </p>
+            {% if message.username == session.username %}
+                <a href="/edit_message/{{message.id}}">Edit message</a>
+                <a href="/delete_message/{{message.id}}">Delete message</a>
+            {% endif %}
+        {% endfor %}
+        <hr />
+    {% else %}
+        <p>You are not logged in! Please log in to see threads.</p>
+        <input type="button" value="Log in" action="/">
+    {% endif %}
+</body>
+</html>
