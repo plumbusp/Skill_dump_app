@@ -10,7 +10,7 @@
             <button>Create thread</button>
         </form>
         {% for thread in threads%}
-            <a href="/thread/{{thread.title}}"><b>{{thread.title}}</b></a>
+            <a href="/thread/{{thread.id}}"><b>{{thread.title}}</b></a>
             <p> There are total of {{thread.total}} messages in this thread.</p>
             <hr />
         {% endfor %}

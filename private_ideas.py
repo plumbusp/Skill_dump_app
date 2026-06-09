@@ -17,10 +17,12 @@ def add_private_idea(idea: str, content:str):
 def get_idea(idea_id)-> list:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
 
-def update_idea(idea_id:int, content:str):
-    db.execute("UPDATE ideas SET title = ? WHERE id = ?", [content, idea_id])
 
-def remove_idea(idea_id:int):
+
+def update_idea(idea_id:int, content:str, title:str):
+    db.execute("UPDATE ideas SET title = ?, content = ? WHERE id = ?", [title, content, idea_id])
+
+def delete_idea(idea_id:int):
     db.execute("DELETE FROM ideas WHERE id = ?", [idea_id])
 
 def find_matches(keyword:str)-> list:

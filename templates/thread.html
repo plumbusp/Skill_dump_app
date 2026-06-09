@@ -2,7 +2,15 @@
 <html>
 <body>
     {% if session.user_id %}
-        <h1> {{title_of_thread}}</h1>
+        <h1> {{thread.title}}</h1>
+        <p> Add new message: </p>
+        <form action="/new_message" method="post">
+            <input type="text" name="new_message" />
+            <input type = "hidden" name="thread_id" value="{{thread.id}}" />
+            <button>Submit!</button>
+        </form>
+        <hr />
+
         {% for message in messages %}
             <p>
                 {{ message.username }} ({{ message.sent_at }}):
@@ -11,8 +19,8 @@
                 {{ message.content }}
             </p>
             {% if message.username == session.username %}
-                <a href="/edit_message/{{message.id}}">Edit message</a>
-                <a href="/delete_message/{{message.id}}">Delete message</a>
+                <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
+                <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
             {% endif %}
         {% endfor %}
         <hr />

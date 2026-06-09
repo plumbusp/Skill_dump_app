@@ -15,6 +15,10 @@ def get_threads():
              ORDER BY t.id DESC"""
     return db.query(sql)
 
+def get_thread(thread_id):
+    sql = """SELECT * FROM threads WHERE id = ?"""
+    return db.query_one(sql, [thread_id])
+
 def add_thread(title, initial_message):
     user_id = session["user_id"]
     db.execute("""INSERT INTO threads (title, user_id)
@@ -23,22 +27,46 @@ def add_thread(title, initial_message):
     g.lastthreadid = thread_id
     add_message_to_thread(initial_message, thread_id)
 
-def get_name(thread_id:int):
-    title = db.query_one("""SELECT title FROM threads WHERE id = ? """, [thread_id])
-    print(f"title {title}")
-    return title["title"]
+def add_message(content, thread_id, user_id):
+    username = session["username"]
+    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id) VALUES (?, datetime('now'), ?, ?)"
+    db.execute(sql, [content, user_id,thread_id])
+
+# def get_name(thread_id:int):
+#     result = db.query_one("""SELECT title FROM threads WHERE id = ? """, [thread_id])
+#     return result["title"]
 
 def get_last_thread_id():
     return g.lastthreadid
 
 def add_message_to_thread(content, thread_id):
-    sql = """INSERT INTO messages (content, sent_at, user_id, thread_id)
-             VALUES (?, datetime('now'), ?, ?)"""
-    db.execute(sql, [content, session["user_id"], thread_id])
+    sql = """INSERT INTO messages (content, sent_at, user_id, username, thread_id)
+             VALUES (?, datetime('now'), ?, ?, ?)"""
+    print(f"Username {session["username"]}")
+    db.execute(sql, [content, session["user_id"], session["username"], thread_id])
 
 def get_messages(thread_id):
-    sql = """SELECT m.id, m.content, m.sent_at, m.user_id, l.usernames
-             FROM messages m, log_in_info l
-             WHERE m.user_id = l.id AND m.thread_id = ?
-             ORDER BY m.id"""
+    sql = """SELECT messages.*, log_in_info.usernames AS username
+        FROM messages
+        JOIN log_in_info ON messages.user_id = log_in_info.id
+        WHERE messages.thread_id = ?"""
+    
     return db.query(sql, [thread_id])
+
+def get_message(thread_id:int, message_id:int):
+    sql = """SELECT * FROM messages 
+    WHERE thread_id = ? AND id = ?"""
+    return db.query_one(sql, [thread_id, message_id])
+
+def update_message(thread_id:int, message_id:int, content:str):
+    db.execute("""UPDATE messages SET content = ? 
+   WHERE thread_id = ? AND id = ?""", [content, thread_id, message_id])
+    
+def delete_message(thread_id:int, message_id:int):
+    db.execute("""DELETE FROM messages WHERE thread_id = ? AND id = ?""",
+               [thread_id, message_id])
+
+# def get_thread_id_from_message(message_id):
+#     sql = """SELECT thread_id FROM messages WHERE messages.id = ?"""
+#     result = db.query_one(sql, [message_id])
+#     return result["thread_id"]

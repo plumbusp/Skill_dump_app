@@ -5,13 +5,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 import private_ideas, forum
+import os
+import sys
 
 app = Flask(__name__)
 ### creating all tables in databse:
 db.create_app_tables()
 
-app.secret_key = config.secret_key
+if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
+    print("Secret Key is not set!", flush=True)
+    sys.exit(1)
 initialized = False
+app.secret_key = SECRET_KEY
 
 @app.route("/sign_up_page")
 def sign_up_page():
@@ -98,25 +103,26 @@ def edit_idea(idea_id):
     idea = private_ideas.get_idea(idea_id)
 
     if request.method == "GET":
-        return render_template("edit.html", idea=idea)
+        return render_template("edit.html", for_idea=True, for_message=False, idea=idea)
 
     if request.method == "POST":
-        content = request.form["content"]
-        private_ideas.update_idea(idea["id"], content)
+        new_content = request.form["edited_content"]
+        new_title = request.form["edited_title"]
+        private_ideas.update_idea(int(idea_id),new_content, new_title)
         return redirect("/private_ideas")
     return "what is it then?? ERROR!"
 
 
-@app.route("/remove/<int:idea_id>", methods=["GET","POST"])
-def remove_idea(idea_id):
+@app.route("/delete/<int:idea_id>", methods=["GET","POST"])
+def delete_idea(idea_id):
     idea = private_ideas.get_idea(idea_id)
 
     if request.method == "GET":
-        return render_template("remove.html", idea=idea)
+        return render_template("delete.html",for_idea=True, for_message=False, idea=idea)
 
     if request.method == "POST":
         if "continue" in request.form:
-            private_ideas.remove_idea(idea["id"])
+            private_ideas.delete_idea(idea_id)
         return redirect("/private_ideas")
     
     return "what is it then?? ERROR!"
@@ -133,6 +139,7 @@ def search_private_ideas():
 
 print(__name__)
 
+
 #####
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
@@ -141,20 +148,63 @@ def show_home():
 
 @app.route("/threads", methods = ["GET"])
 def show_threads():
-    return render_template("threads.html")
+    threads = forum.get_threads()
+    return render_template("threads.html", threads=threads)
+
+
 
 #### THREADS (PUBLIC) ####
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
+    thread = forum.get_thread(thread_id)
     messages = forum.get_messages(thread_id)
-    title = forum.get_name(thread_id)
-    return render_template("thread.html", messages=messages, title_of_thread=title)
+    return render_template("thread.html", messages=messages, thread=thread)
 
 @app.route("/create_thread", methods=["POST"])
 def create_thread():
     title = request.form["title_of_new_thread"]
     initial_message = request.form["initial_message"]
     forum.add_thread(title, initial_message)
+
     thread_id = forum.get_last_thread_id()
     return redirect(f"/thread/{thread_id}")
+
+@app.route("/new_message", methods = ["POST"])
+def add_message():
+    message = request.form["new_message"]
+    thread_id = request.form["thread_id"]
+    forum.add_message(message, thread_id, session["user_id"])
+    return redirect(f"/thread/{thread_id}")
+
+
+@app.route("/edit_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
+def edit_message(thread_id:int, message_id: int):
+    thread = forum.get_thread(thread_id)
+    message = forum.get_message(thread_id, message_id)
+
+    if request.method == "GET":
+        return render_template("edit.html", for_idea = False, for_message = True, message=message, thread=thread)
+
+    elif request.method == "POST":
+        new_contemt = request.form["content"]
+        forum.update_message(thread_id, message_id, new_contemt)
+        return redirect(f"/thread/{thread_id}")
+        
+    return redirect(f"/thread/{thread_id}")
+
+@app.route("/delete_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
+def delete_message(thread_id:int, message_id: int):
+    thread = forum.get_thread(thread_id)
+    message = forum.get_message(thread_id, message_id)
+    if request.method == "GET":
+        return render_template("delete.html", for_idea = False, for_message = True, message=message, thread =thread)
+
+    elif request.method == "POST":
+        forum.delete_message(thread_id,message_id)
+        return redirect(f"/thread/{thread_id}")
+        
+    return redirect(f"/thread/{thread_id}")
+
+
+
 
