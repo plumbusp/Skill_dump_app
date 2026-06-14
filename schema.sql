@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS log_in_info (
     id INTEGER PRIMARY KEY,
     usernames varchar(50) UNIQUE,
-    passwords TEXT
+    passwords TEXT,
+    image BLOB
 );
 
 CREATE TABLE IF NOT EXISTS ideas (

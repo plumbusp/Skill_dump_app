@@ -1,12 +1,13 @@
 import sqlite3
-from flask import Flask, session, abort
+from flask import Flask, session, abort,make_response
 from flask import redirect, render_template, request
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
-import private_ideas, forum
+import private_ideas, forum, users
 import os
 import sys
+from werkzeug.datastructures import FileStorage
 
 app = Flask(__name__)
 ### creating all tables in databse:
@@ -170,9 +171,13 @@ print(__name__)
 #####
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
-def show_home():
+def show_home(user=None):
     # Log in status is handled inside the html file
-    return render_template("index.html")
+    if "user_id" in session:
+        user = users.get_user(session["user_id"])
+        return render_template("index.html", user=user)
+    else:
+        return render_template("index.html")
 
 
 
@@ -282,5 +287,47 @@ def delete_message(thread_id:int, message_id: int):
     return redirect(f"/thread/{thread_id}")
 
 
+#### USER PROFILES ######
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    require_log_in()
 
+    if user_id == session["user_id"]:
+        return redirect("/")
+    
+    user = users.get_user(user_id)
+    if not user:
+        abort(404)
+    last_messages = users.get_last_messages(user_id)
+    print("last messages: ", last_messages, flush=True)
+    return render_template("user.html", user=user, last_messages=last_messages)
 
+### USER IMAGES ###
+@app.route("/add_image", methods=["POST"])
+def add_image():
+    require_log_in()
+    
+    file = request.files["image"]
+    if not file.filename.endswith(".jpg"):
+        return "Wrong image type! (jpg images only)"
+
+    image = file.read()
+    if len(image) > 100 * 1024:
+        return "The image it too big!"
+
+    user_id = session["user_id"]
+    users.update_image(user_id, image)
+    user = users.get_user(user_id)
+    return show_home(user=user)
+    
+
+@app.route("/image/<int:user_id>")
+def show_image(user_id):
+    image = users.get_image(user_id)
+    if not image:
+        abort(404)
+
+    response = make_response(bytes(image))
+    response.headers.set("Content-Type", "image/jpeg")
+    return response
+    

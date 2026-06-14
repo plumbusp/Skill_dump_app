@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile of {user.usernames}:</title>
+</head>
+
+<body>
+    <h1>Profile of {{user.usernames}}:</h1>
+    {% if user.has_image %}
+      <img src="/image/{{ user.id }}" />
+    {% endif %}
+    <p> Last sent public ideas: </p>
+    {% for message in last_messages %}
+        <p><i>{{message.sent_at}}</i></p>
+        <p>{{message.content}}</p>
+    {% endfor %}
+</body>
+
+</html>

@@ -12,9 +12,9 @@
         <hr />
 
         {% for message in messages %}
-            <p>
-                {{ message.username }} ({{ message.sent_at }}):
-            </p>
+            
+            <a href="/user/{{message.user_id}}">{{message.username}}</a>
+            <p>({{ message.sent_at }}):</p>
             <p>
                 {{ message.content }}
             </p>
