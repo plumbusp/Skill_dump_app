@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, session
+from flask import Flask, session, abort
 from flask import redirect, render_template, request
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
@@ -74,6 +74,7 @@ def log_in():
     else: 
         print("Invalid password")
         return render_template("index.html",valid_login=False)
+    
 @app.route("/logout")
 def log_out():
     session.clear()
@@ -82,6 +83,7 @@ def log_out():
 @app.route("/")
 def log_in_page():
     return render_template("index.html",valid_login=True)
+
 
 #### IDEAS (PRIVATE) ####
 @app.route("/private_ideas")
@@ -182,6 +184,9 @@ def edit_message(thread_id:int, message_id: int):
     thread = forum.get_thread(thread_id)
     message = forum.get_message(thread_id, message_id)
 
+    if message["user_id"] != session["user_id"]:
+        abort(403) # Forbidden access
+
     if request.method == "GET":
         return render_template("edit.html", for_idea = False, for_message = True, message=message, thread=thread)
 
@@ -194,8 +199,11 @@ def edit_message(thread_id:int, message_id: int):
 
 @app.route("/delete_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
 def delete_message(thread_id:int, message_id: int):
-    thread = forum.get_thread(thread_id)
     message = forum.get_message(thread_id, message_id)
+
+    if message["user_id"] != session["user_id"]:
+        abort(403) # Forbidden access
+
     if request.method == "GET":
         return render_template("delete.html", for_idea = False, for_message = True, message=message, thread =thread)
 

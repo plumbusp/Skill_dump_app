@@ -14,7 +14,7 @@ def add_private_idea(idea: str, content:str):
         return "NO USER ID"
     db.execute("INSERT INTO ideas (title, content, user_id) VALUES (?,?,?)",[idea, content, session["user_id"]])
 
-def get_idea(idea_id)-> list:
+def get_idea(idea_id)-> dict:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
 
 
