@@ -18,6 +18,12 @@ if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
 initialized = False
 app.secret_key = SECRET_KEY
 
+#### HELPER/ GENERAL METHODS ####
+def require_log_in():
+    if "user_id" not in session:
+        abort(403)
+
+### SIGNING IN/ LOGGING IN ####
 @app.route("/sign_up_page")
 def sign_up_page():
     return render_template("sign_up_page.html", passwords_match = True)
@@ -88,6 +94,8 @@ def log_in_page():
 #### IDEAS (PRIVATE) ####
 @app.route("/private_ideas")
 def show_private_ideas():
+    require_log_in()
+
     return private_ideas.get_private_ideas()
 
 @app.route("/add_private_idea", methods=["POST"])
@@ -102,6 +110,8 @@ def add_idea():
 
 @app.route("/edit/<int:idea_id>", methods=["GET", "POST"])
 def edit_idea(idea_id):
+    require_log_in()
+
     idea = private_ideas.get_idea(idea_id)
 
     if request.method == "GET":
@@ -117,6 +127,8 @@ def edit_idea(idea_id):
 
 @app.route("/delete/<int:idea_id>", methods=["GET","POST"])
 def delete_idea(idea_id):
+    require_log_in()
+
     idea = private_ideas.get_idea(idea_id)
 
     if request.method == "GET":
@@ -131,6 +143,8 @@ def delete_idea(idea_id):
 
 @app.route("/search_private_ideas", methods =["GET"])
 def search_private_ideas():
+    require_log_in()
+
     keyword =request.args.get("keyword")
     if not keyword:
         return redirect("/private_ideas")
@@ -146,10 +160,12 @@ print(__name__)
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
 def show_home():
+    # Log in status is handled inside the html file
     return render_template("index.html")
 
 @app.route("/threads", methods = ["GET"])
 def show_threads():
+    # Log in status is handled inside the html file
     threads = forum.get_threads()
     return render_template("threads.html", threads=threads)
 
@@ -158,6 +174,8 @@ def show_threads():
 #### THREADS (PUBLIC) ####
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
+    require_log_in()
+
     thread = forum.get_thread(thread_id)
     if not thread: # If user went to the thread that does not exist
         abort(403)
@@ -186,6 +204,8 @@ def add_message():
 
 @app.route("/edit_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
 def edit_message(thread_id:int, message_id: int):
+    require_log_in()
+
     thread = forum.get_thread(thread_id)
     message = forum.get_message(thread_id, message_id)
 
@@ -204,6 +224,8 @@ def edit_message(thread_id:int, message_id: int):
 
 @app.route("/delete_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
 def delete_message(thread_id:int, message_id: int):
+    require_log_in()
+    
     message = forum.get_message(thread_id, message_id)
 
     if message["user_id"] != session["user_id"]:
