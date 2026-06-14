@@ -83,6 +83,8 @@ def log_in():
     
 @app.route("/logout")
 def log_out():
+    require_log_in()
+    
     session.clear()
     return render_template("index.html",valid_login=True)
 
@@ -100,6 +102,8 @@ def show_private_ideas():
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
+    require_log_in()
+
     idea = request.form["idea"]
     content = request.form["content"]
     if idea.strip() == "":
@@ -184,6 +188,8 @@ def show_thread(thread_id:int):
 
 @app.route("/create_thread", methods=["POST"])
 def create_thread():
+    require_log_in()
+
     title = request.form["title_of_new_thread"]
     initial_message = request.form["initial_message"]
     forum.add_thread(title, initial_message)
@@ -193,6 +199,8 @@ def create_thread():
 
 @app.route("/new_message", methods = ["POST"])
 def add_message():
+    require_log_in()
+    
     try:
         message = request.form["new_message"]
         thread_id = request.form["thread_id"]
@@ -225,7 +233,7 @@ def edit_message(thread_id:int, message_id: int):
 @app.route("/delete_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
 def delete_message(thread_id:int, message_id: int):
     require_log_in()
-    
+
     message = forum.get_message(thread_id, message_id)
 
     if message["user_id"] != session["user_id"]:
