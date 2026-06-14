@@ -93,6 +93,7 @@ def log_in_page():
     return render_template("index.html",valid_login=True)
 
 
+
 #### IDEAS (PRIVATE) ####
 @app.route("/private_ideas")
 def show_private_ideas():
@@ -165,6 +166,7 @@ def search_private_ideas():
 print(__name__)
 
 
+
 #####
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
@@ -172,15 +174,28 @@ def show_home():
     # Log in status is handled inside the html file
     return render_template("index.html")
 
+
+
+#### THREADS (PUBLIC) ####
+
 @app.route("/threads", methods = ["GET"])
 def show_threads():
     # Log in status is handled inside the html file
     threads = forum.get_threads()
     return render_template("threads.html", threads=threads)
 
+@app.route("/search_threads", methods =["GET"])
+def search_threads():
+    require_log_in()
+    keyword =request.args.get("keyword")
+    if not keyword:
+        return redirect("/threads")
+        
+    matches = forum.find_matches(keyword)
+    print(matches)
+    return render_template("threads.html", threads=matches)
 
 
-#### THREADS (PUBLIC) ####
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
     require_log_in()
@@ -190,6 +205,7 @@ def show_thread(thread_id:int):
         abort(403)
     messages = forum.get_messages(thread_id)
     return render_template("thread.html", messages=messages, thread=thread)
+
 
 @app.route("/create_thread", methods=["POST"])
 def create_thread():

@@ -66,6 +66,14 @@ def update_message(thread_id:int, message_id:int, content:str):
 def delete_message(thread_id:int, message_id:int):
     db.execute("""DELETE FROM messages WHERE thread_id = ? AND id = ?""",
                [thread_id, message_id])
+    
+def find_matches(keyword: str):
+    sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last
+             FROM threads t, messages m
+             WHERE t.id = m.thread_id AND t.title LIKE ?
+             GROUP BY t.id
+             ORDER BY t.id DESC"""
+    return db.query(sql, [f"%{keyword}%"])
 
 # def get_thread_id_from_message(message_id):
 #     sql = """SELECT thread_id FROM messages WHERE messages.id = ?"""

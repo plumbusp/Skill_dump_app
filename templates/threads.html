@@ -9,6 +9,13 @@
             <textarea rows="4" cols="40" name="initial_message" maxlength="500"></textarea><br>
             <button>Create thread</button>
         </form>
+
+        <form action="/search_threads" method="GET">
+            <label for = "search">Search threads:</label><br>
+            <input type="text" name="keyword" maxlength="100"><br>
+            <button>Search</button> <br>
+        </form>
+
         {% for thread in threads%}
             <a href="/thread/{{thread.id}}"><b>{{thread.title}}</b></a>
             <p> There are total of {{thread.total}} messages in this thread.</p>
