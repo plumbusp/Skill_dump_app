@@ -5,9 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 
-def get_private_ideas() -> str:
+def get_private_ideas(invalid_title=False, invalid_content=False) -> str:
     ideas = db.query("SELECT * FROM ideas WHERE user_id = ?", [session["user_id"]])
-    return render_template("private_ideas.html", ideas=ideas)
+    return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content)
 
 def add_private_idea(idea: str, content:str):
     if not session["user_id"]:

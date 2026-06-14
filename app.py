@@ -106,8 +106,13 @@ def add_idea():
 
     idea = request.form["idea"]
     content = request.form["content"]
-    if idea.strip() == "":
-        return redirect("/private_ideas")
+    clean_idea = idea.strip()
+    clean_content = content.strip()
+    if len(clean_idea) > 100 or len(clean_idea) == 0:
+        return private_ideas.get_private_ideas(invalid_title=True)
+    elif len(clean_content) > 1000 or len(clean_content) == 0:
+        return private_ideas.get_private_ideas(invalid_content=True)
+
 
     private_ideas.add_private_idea(idea, content)
     return redirect("/private_ideas")

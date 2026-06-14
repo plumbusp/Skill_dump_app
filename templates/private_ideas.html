@@ -6,19 +6,27 @@
     <p>
         Here is your private ideas page. You can write your thoughts here,
         and they will be visible only to you. <br>
+
         <form action="/search_private_ideas" method="GET">
             <label for = "search">Search your ideas:</label><br>
-            <input type="text" name="keyword"><br>
+            <input type="text" name="keyword" maxlength="100"><br>
             <button>Search</button> <br>
         </form>
+
         <form action="/add_private_idea" method="POST">
             <label for = "idea">Write your idea here:</label><br>
             <p>Title:</p>
-            <input type="text" name="idea"><br>
+            <input type="text" name="idea" maxlength="100"><br>
             <p>Content:</p>
-            <textarea rows="4" cols="40" name="content"></textarea><br>
+            <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
             <button>Add idea</button> <br>
+            {% if invalid_content %}
+                <p> Content cannot be empty or have more than 1000 characters!</p>
+            {% elif invalid_title %}
+                <p> Title cannot be empty or have more than 100 characters!</p>
+            {% endif %}
         </form>
+
         Here are your private ideas: <br>
         {% for idea in ideas %}
             <p><b>{{idea["title"]}}</b></p>

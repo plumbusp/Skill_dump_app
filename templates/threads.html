@@ -4,9 +4,9 @@
     {% if session.username %}
         <form action="/create_thread" method="post"> 
             <label for="create_thread"> Create thread </label>
-            <input type="text" name="title_of_new_thread">
+            <input type="text" name="title_of_new_thread" maxlength="100">
             <p>Write your message here:</p>
-            <textarea rows="4" cols="40" name="initial_message"></textarea><br>
+            <textarea rows="4" cols="40" name="initial_message" maxlength="500"></textarea><br>
             <button>Create thread</button>
         </form>
         {% for thread in threads%}
