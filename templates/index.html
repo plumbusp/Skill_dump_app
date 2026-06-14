@@ -22,7 +22,16 @@
         <li><a href="/threads">Threads</a></li>
         <li><a href="/private_ideas">Your skills page (private)</a></li>
     </ul>
+    <hr>
+    <h3>Stats on the private ideas:</h3>
+    <p>Total number of skills: {{ total_skills }}</p>
+    <br>
+    <p>Stats:</p>
+    {% for stat in skill_stats %}
+        <p>{{ stat }}</p>
+    {% endfor %}
 
+    <h4>Profile picture:</h4>
     {% if user and user.has_image %}
       <img src="/image/{{ user.id }}" />
     {% endif %}

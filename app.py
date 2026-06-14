@@ -191,9 +191,13 @@ def add_skill():
 @app.route("/", methods = ["GET"])
 def show_home(user=None):
     # Log in status is handled inside the html file
+
     if "user_id" in session:
+        print("USER IDD", flush=True)
+        total_skills = users.get_total_skills(session["user_id"])
+        skill_stats = users.get_skill_stats(session["user_id"])
         user = users.get_user(session["user_id"])
-        return render_template("index.html", user=user)
+        return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
     else:
         return render_template("index.html")
 

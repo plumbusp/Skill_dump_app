@@ -24,7 +24,7 @@
             <select name="type_of_skill">
                 <option value="None">None</option>
                 {% for skill in user_skill_types %}
-                    <option value="{{skill.id}}">{{skill.name}}</option>
+                    <option value="{{skill.name}}">{{skill.name}}</option>
                 {% endfor %}
             </select><br>
             <label for = "idea">Write your skill here:</label><br>

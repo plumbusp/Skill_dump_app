@@ -56,8 +56,35 @@ def update_image(user_id, image):
 
 def add_type_of_skill(user_id:int, skill:str):
     sql = "INSERT INTO skill_types (name, user_id) VALUES (?,?)"
-    db.execute(sql,[ skill, user_id])
+    db.execute(sql,[skill, user_id])
 
-def get_users_skills(user_id):
+def get_users_skills(user_id:int):
     sql = "SELECT * FROM skill_types WHERE user_id = ?"
     return db.query(sql, [user_id])
+
+def get_total_skills(user_id:int)-> int:
+    sql = "SELECT COUNT(*) count FROM ideas WHERE user_id = ?"
+    return db.query_one(sql, [user_id])["count"]
+
+def get_skill_stats(user_id:int)->list:
+    sql = """SELECT COALESCE(st.name, 'Uncategorized') skill_type_name, COUNT(i.id) total
+            FROM ideas i
+            LEFT JOIN skill_types st ON i.type_of_skill = st.id
+            WHERE i.user_id = ?
+            GROUP BY st.id
+            ORDER BY total DESC"""
+    result = db.query(sql, [user_id])
+    total_count = 0
+
+    for row in result:
+        total_count += int(row["total"])
+    one_percent = total_count/100
+    
+    stats = {}
+    for row in result:
+        stats[row["usernames"]] = (row["skill_type_name"], row["total"])
+
+    strings = []
+    for name, tuple in stats.items():
+        strings.append(f"{tuple[0]} has {tuple[1]} apperances and is {one_percent*tuple[1]}% of all skills")
+    return strings

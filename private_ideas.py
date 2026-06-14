@@ -6,13 +6,14 @@ import config
 import db
 
 def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_types=[]) -> str:
-    ideas = db.query("SELECT * FROM ideas WHERE user_id = ?", [session["user_id"]])
+    sql = """SELECT i.*, COALESCE(st.name, '') skill_type_name
+            FROM ideas i
+            LEFT JOIN skill_types st ON i.type_of_skill = st.id
+            WHERE i.user_id = ?"""
+    ideas = db.query(sql, [session["user_id"]])
     return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content,user_skill_types=user_skill_types)
 
 def add_private_idea(idea: str, content:str, type_of_skill:str):
-    if not session["user_id"]:
-        return "NO USER ID"
-    print("INSERTING TYPE OF SKILL ", type_of_skill, flush= True)
     db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])
 
 def get_idea(idea_id)-> dict:
