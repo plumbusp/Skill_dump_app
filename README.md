@@ -18,6 +18,8 @@ Learn somethings new eveyday, but forget with time? That application is the solu
 
 ## How to test:
 - Install python and flask. If flask is not installed: pip install flask
+- Set up the envioromental variable SECRET_KEY. Use this command (powershell)
+```$env:SECRET_KEY = (python -c "import secrets; print(secrets.token_hex(8))")```
 - run the application suing 'flask run' command and go to the  http://127.0.0.1:5000
   
 
