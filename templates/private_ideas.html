@@ -13,7 +13,18 @@
             <button>Search</button> <br>
         </form>
 
+        <form action="/add_skill_type" method="POST">
+            <p>Add new type of skill (reloads the page):</p>
+            <input name = "new_skill" type="text" maxlength="50"><br>
+            <button>Add</button> <br>
+        </form>
         <form action="/add_private_idea" method="POST">
+            <p>Type of skill:</p>
+            <select name="type_of_skill">
+                {% for skill in user_skill_types %}
+                    <option value="{{skill.id}}">{{skill.name}}</option>
+                {% endfor %}
+            </select><br>
             <label for = "idea">Write your idea here:</label><br>
             <p>Title:</p>
             <input type="text" name="idea" maxlength="100"><br>

@@ -9,6 +9,13 @@ CREATE TABLE IF NOT EXISTS ideas (
     id INTEGER PRIMARY KEY,
     title TEXT,
     content TEXT,
+    type_of_skill TEXT,
+    user_id INTEGER REFERENCES log_in_info(id)
+);
+
+CREATE TABLE IF NOT EXISTS skill_types (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
     user_id INTEGER REFERENCES log_in_info(id)
 );
 

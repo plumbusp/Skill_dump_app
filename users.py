@@ -53,3 +53,11 @@ def get_image(user_id):
 def update_image(user_id, image):
     sql = "UPDATE log_in_info SET image = ? WHERE id = ?"
     db.execute(sql, [image, user_id])
+
+def add_type_of_skill(user_id:int, skill:str):
+    sql = "INSERT INTO skill_types (name, user_id) VALUES (?,?)"
+    db.execute(sql,[ skill, user_id])
+
+def get_users_skills(user_id):
+    sql = "SELECT name FROM skill_types WHERE user_id = ?"
+    return db.query(sql, [user_id])

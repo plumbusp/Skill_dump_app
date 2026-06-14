@@ -100,7 +100,8 @@ def log_in_page():
 def show_private_ideas():
     require_log_in()
 
-    return private_ideas.get_private_ideas()
+    user_skill_types = users.get_users_skills(session["user_id"])
+    return private_ideas.get_private_ideas(user_skill_types=user_skill_types)
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
@@ -108,6 +109,8 @@ def add_idea():
 
     idea = request.form["idea"]
     content = request.form["content"]
+    type_of_skill = request.form["type_of_skill"]
+
     clean_idea = idea.strip()
     clean_content = content.strip()
     if len(clean_idea) > 100 or len(clean_idea) == 0:
@@ -116,7 +119,7 @@ def add_idea():
         return private_ideas.get_private_ideas(invalid_content=True)
 
 
-    private_ideas.add_private_idea(idea, content)
+    private_ideas.add_private_idea(idea, content, type_of_skill)
     return redirect("/private_ideas")
 
 @app.route("/edit/<int:idea_id>", methods=["GET", "POST"])
@@ -165,6 +168,18 @@ def search_private_ideas():
     return render_template("private_ideas.html", ideas=matches)
 
 print(__name__)
+
+
+#### SKILLS ####
+@app.route("/add_skill_type", methods =["POST"])
+def add_skill():
+    require_log_in()
+
+    skill = request.form["new_skill"]
+    if len(skill.strip()) == 0 or len(skill.strip()) > 50:
+        return "Invalid skill input! The skill can't be empty or longer than 50 char."
+    users.add_type_of_skill(session["user_id"], skill)
+    return redirect("/private_ideas")
 
 
 

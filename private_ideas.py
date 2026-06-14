@@ -5,14 +5,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 
-def get_private_ideas(invalid_title=False, invalid_content=False) -> str:
+def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_types=[]) -> str:
     ideas = db.query("SELECT * FROM ideas WHERE user_id = ?", [session["user_id"]])
-    return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content)
+    return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content,user_skill_types=user_skill_types)
 
-def add_private_idea(idea: str, content:str):
+def add_private_idea(idea: str, content:str, type_of_skill:str):
     if not session["user_id"]:
         return "NO USER ID"
-    db.execute("INSERT INTO ideas (title, content, user_id) VALUES (?,?,?)",[idea, content, session["user_id"]])
+    db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])
 
 def get_idea(idea_id)-> dict:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
