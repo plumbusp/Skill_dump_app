@@ -196,7 +196,15 @@ def create_thread():
     require_log_in()
 
     title = request.form["title_of_new_thread"]
+    clean_title = title.strip()
+    if len(clean_title) == 0 or len(clean_title) > 100:
+        abort(403) 
+
     initial_message = request.form["initial_message"]
+    clean_message = initial_message.strip()
+    if len(clean_message) == 0 or len(clean_message) > 500:
+        abort(403)
+
     forum.add_thread(title, initial_message)
 
     thread_id = forum.get_last_thread_id()
@@ -208,6 +216,10 @@ def add_message():
     
     try:
         message = request.form["new_message"]
+        clean_message = message.strip()
+        if len(clean_message) == 0 or len(clean_message) > 500:
+            abort(403)
+
         thread_id = request.form["thread_id"]
         forum.add_message(message, thread_id, session["user_id"])
         return redirect(f"/thread/{thread_id}")

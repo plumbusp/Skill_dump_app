@@ -5,7 +5,7 @@
         <h1> {{thread.title}}</h1>
         <p> Add new message: </p>
         <form action="/new_message" method="post">
-            <input type="text" name="new_message" />
+            <input type="text" name="new_message" maxlength="500" />
             <input type = "hidden" name="thread_id" value="{{thread.id}}" />
             <button>Submit!</button>
         </form>
