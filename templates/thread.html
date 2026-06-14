@@ -18,7 +18,7 @@
             <p>
                 {{ message.content }}
             </p>
-            {% if message.username == session.username %}
+            {% if message.user_id == session.user_id %}
                 <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
                 <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
             {% endif %}

@@ -28,9 +28,9 @@ def add_thread(title, initial_message):
     add_message_to_thread(initial_message, thread_id)
 
 def add_message(content, thread_id, user_id):
-    username = session["username"]
-    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id) VALUES (?, datetime('now'), ?, ?)"
-    db.execute(sql, [content, user_id,thread_id])
+    username = db.query_one("SELECT usernames FROM log_in_info WHERE id = ?", [user_id])["usernames"]
+    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id, username) VALUES (?, datetime('now'), ?, ?, ?)"
+    db.execute(sql, [content, user_id, thread_id, username])
 
 # def get_name(thread_id:int):
 #     result = db.query_one("""SELECT title FROM threads WHERE id = ? """, [thread_id])
