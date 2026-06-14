@@ -159,6 +159,8 @@ def show_threads():
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
     thread = forum.get_thread(thread_id)
+    if not thread: # If user went to the thread that does not exist
+        abort(403)
     messages = forum.get_messages(thread_id)
     return render_template("thread.html", messages=messages, thread=thread)
 
@@ -173,10 +175,13 @@ def create_thread():
 
 @app.route("/new_message", methods = ["POST"])
 def add_message():
-    message = request.form["new_message"]
-    thread_id = request.form["thread_id"]
-    forum.add_message(message, thread_id, session["user_id"])
-    return redirect(f"/thread/{thread_id}")
+    try:
+        message = request.form["new_message"]
+        thread_id = request.form["thread_id"]
+        forum.add_message(message, thread_id, session["user_id"])
+        return redirect(f"/thread/{thread_id}")
+    except: # catches internal server error, if e.g. a user changed thread_id in page inspection to the unexisting one
+        abort(403)
 
 
 @app.route("/edit_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])

@@ -17,7 +17,8 @@ def get_threads():
 
 def get_thread(thread_id):
     sql = """SELECT * FROM threads WHERE id = ?"""
-    return db.query_one(sql, [thread_id])
+    result = db.query_one(sql, [thread_id])
+    return result if result else None
 
 def add_thread(title, initial_message):
     user_id = session["user_id"]
