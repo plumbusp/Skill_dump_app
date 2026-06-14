@@ -12,6 +12,7 @@ def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_typ
 def add_private_idea(idea: str, content:str, type_of_skill:str):
     if not session["user_id"]:
         return "NO USER ID"
+    print("INSERTING TYPE OF SKILL ", type_of_skill, flush= True)
     db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])
 
 def get_idea(idea_id)-> dict:

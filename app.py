@@ -110,6 +110,9 @@ def add_idea():
     idea = request.form["idea"]
     content = request.form["content"]
     type_of_skill = request.form["type_of_skill"]
+    print(f"type_of_skill {type_of_skill}", flush=True)
+    if type_of_skill == "None":
+        type_of_skill = ""
 
     clean_idea = idea.strip()
     clean_content = content.strip()

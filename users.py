@@ -59,5 +59,5 @@ def add_type_of_skill(user_id:int, skill:str):
     db.execute(sql,[ skill, user_id])
 
 def get_users_skills(user_id):
-    sql = "SELECT name FROM skill_types WHERE user_id = ?"
+    sql = "SELECT * FROM skill_types WHERE user_id = ?"
     return db.query(sql, [user_id])

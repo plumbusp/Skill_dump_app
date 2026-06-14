@@ -18,9 +18,11 @@
             <input name = "new_skill" type="text" maxlength="50"><br>
             <button>Add</button> <br>
         </form>
+
         <form action="/add_private_idea" method="POST">
             <p>Type of skill:</p>
             <select name="type_of_skill">
+                <option value="None">None</option>
                 {% for skill in user_skill_types %}
                     <option value="{{skill.id}}">{{skill.name}}</option>
                 {% endfor %}
@@ -40,6 +42,11 @@
 
         Here are your skills: <br>
         {% for idea in ideas %}
+            <hr>
+            <p>---------</p>
+            {% if idea.type_of_skill != "" %}
+                <p>Type of skill: {{idea.type_of_skill}}</p>
+            {% endif %}
             <p><b>{{idea["title"]}}</b></p>
             <p>{{idea["content"]}}</p>
               <p>
