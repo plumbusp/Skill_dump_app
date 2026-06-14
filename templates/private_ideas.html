@@ -4,11 +4,11 @@
     {% if session.username %}
     <h1>Hello {{session.username}}!</h1>
     <p>
-        Here is your private ideas page. You can write your thoughts here,
+        Here is your skills page. You can add your new skills here,
         and they will be visible only to you. <br>
 
         <form action="/search_private_ideas" method="GET">
-            <label for = "search">Search your ideas:</label><br>
+            <label for = "search">Search your skills:</label><br>
             <input type="text" name="keyword" maxlength="100"><br>
             <button>Search</button> <br>
         </form>
@@ -25,12 +25,12 @@
                     <option value="{{skill.id}}">{{skill.name}}</option>
                 {% endfor %}
             </select><br>
-            <label for = "idea">Write your idea here:</label><br>
-            <p>Title:</p>
+            <label for = "idea">Write your skill here:</label><br>
+            <p>Title of a skill:</p>
             <input type="text" name="idea" maxlength="100"><br>
-            <p>Content:</p>
+            <p>What have you learned?:</p>
             <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
-            <button>Add idea</button> <br>
+            <button>Add a skill</button> <br>
             {% if invalid_content %}
                 <p> Content cannot be empty or have more than 1000 characters!</p>
             {% elif invalid_title %}
@@ -38,7 +38,7 @@
             {% endif %}
         </form>
 
-        Here are your private ideas: <br>
+        Here are your skills: <br>
         {% for idea in ideas %}
             <p><b>{{idea["title"]}}</b></p>
             <p>{{idea["content"]}}</p>
@@ -49,7 +49,7 @@
         {% endfor %}
     </p>
     {% else %}
-        <p>You are not logged in! Please log in to see your private ideas.</p>
+        <p>You are not logged in! Please log in to see your skills.</p>
     {% endif %}
 </body>
 </html>
