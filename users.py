@@ -78,13 +78,11 @@ def get_skill_stats(user_id:int)->list:
 
     for row in result:
         total_count += int(row["total"])
-    one_percent = total_count/100
     
-    stats = {}
-    for row in result:
-        stats[row["usernames"]] = (row["skill_type_name"], row["total"])
+    one_percent = 100/total_count if total_count else 0
 
     strings = []
-    for name, tuple in stats.items():
-        strings.append(f"{tuple[0]} has {tuple[1]} apperances and is {one_percent*tuple[1]}% of all skills")
+    for row in result:
+        strings.append(
+             f"{row['skill_type_name']} has {row['total']} appearances and is {one_percent*int(row['total']):.1f}% of all skills")
     return strings

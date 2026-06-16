@@ -8,16 +8,25 @@ import private_ideas, forum, users
 import os
 import sys
 from werkzeug.datastructures import FileStorage
+from configparser import ConfigParser # for local testing only
 
 app = Flask(__name__)
 ### creating all tables in databse:
 db.create_app_tables()
 
 if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
-    print("Secret Key is not set!", flush=True)
-    sys.exit(1)
-initialized = False
-app.secret_key = SECRET_KEY
+    con_par = ConfigParser()
+    con_par.read("config.cfg")
+    file = con_par["secret-key"]["secret_key"]
+    print(file)
+    if not file:
+        print("Secret Key is not set!", flush=True)
+        sys.exit(1)
+    initialized = False
+    app.secret_key = file
+else:
+    initialized = False
+    app.secret_key = SECRET_KEY 
 
 #### HELPER/ GENERAL METHODS ####
 def require_log_in():
@@ -77,7 +86,7 @@ def log_in():
         session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
         print("user id ", session["user_id"])
 
-        return render_template("index.html")
+        return redirect("/")
     else: 
         print("Invalid password")
         return render_template("index.html",valid_login=False)
@@ -87,10 +96,6 @@ def log_out():
     require_log_in()
     
     session.clear()
-    return render_template("index.html",valid_login=True)
-
-@app.route("/")
-def log_in_page():
     return render_template("index.html",valid_login=True)
 
 
