@@ -204,7 +204,7 @@ def show_home(user=None):
         user = users.get_user(session["user_id"])
         return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
     else:
-        return render_template("index.html")
+        return render_template("index.html", valid_login = True)
 
 
 
