@@ -8,7 +8,7 @@ import db
 def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_types=[]) -> str:
     sql = """SELECT i.*, COALESCE(st.names, '') skill_type_name
             FROM ideas i
-            LEFT JOIN skill_types st ON i.type_of_skill = st.id
+            LEFT JOIN skill_types st ON i.type_of_skill = st.names
             WHERE i.user_id = ?"""
     ideas = db.query(sql, [session["user_id"]])
     return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content,user_skill_types=user_skill_types)

@@ -69,7 +69,7 @@ def get_total_skills(user_id:int)-> int:
 def get_skill_stats(user_id: int) -> list:
     sql = """SELECT COALESCE(st.names, 'Uncategorized') skill_type_name, COUNT(i.id) total
              FROM ideas i
-             LEFT JOIN skill_types st ON i.type_of_skill = st.id
+             LEFT JOIN skill_types st ON i.type_of_skill = st.names
              WHERE i.user_id = ?
              GROUP BY st.id
              ORDER BY total DESC"""
