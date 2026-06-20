@@ -1,19 +1,32 @@
 <!DOCTYPE html>
 <html>
+    
+<head>
+  <title>Threads</title>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+
 <body>
     {% if session.username %}
         <form action="/create_thread" method="post"> 
-            <label for="create_thread"> Create thread </label>
-            <input type="text" name="title_of_new_thread" maxlength="100">
-            <p>Write your message here:</p>
-            <textarea rows="4" cols="40" name="initial_message" maxlength="500"></textarea><br>
-            <button>Create thread</button>
-        </form>
+            <h4>Create a new thread:</h4>
+            <div class="content_island">
+                <label for="title_of_new_thread"> Thread title:</label><br>
+                <input type="text" name="title_of_new_thread" maxlength="100"><br>
 
+                <label for= "initial_message"> Write a first message to the thread:</label><br>
+                <textarea rows="4" cols="40" name="initial_message" maxlength="500"></textarea><br>
+                <button>Create thread</button>
+            </div>
+
+        </form>
+        
         <form action="/search_threads" method="GET">
-            <label for = "search">Search threads:</label><br>
-            <input type="text" name="keyword" maxlength="100"><br>
-            <button>Search</button> <br>
+            <div class="content_island">
+                <label for = "search">Search threads:</label><br>
+                <input type="text" name="keyword" maxlength="100"><br>
+                <button>Search</button> <br>
+            </div>
         </form>
 
         {% for thread in threads%}

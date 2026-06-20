@@ -116,6 +116,7 @@ def add_idea():
     content = request.form["content"]
     type_of_skill = request.form["type_of_skill"]
     print(f"type_of_skill {type_of_skill}", flush=True)
+
     if type_of_skill == "None":
         type_of_skill = ""
 
@@ -187,6 +188,7 @@ def add_skill():
     if len(skill.strip()) == 0 or len(skill.strip()) > 50:
         return "Invalid skill input! The skill can't be empty or longer than 50 char."
     users.add_type_of_skill(session["user_id"], skill)
+    print("SKILL ", skill)
     return redirect("/private_ideas")
 
 
@@ -305,7 +307,7 @@ def delete_message(thread_id:int, message_id: int):
         abort(403) # Forbidden access
 
     if request.method == "GET":
-        return render_template("delete.html", for_idea = False, for_message = True, message=message, thread =thread)
+        return render_template("delete.html", for_idea = False, for_message = True, message=message, thread_id =thread_id, message_id=message_id)
 
     elif request.method == "POST":
         forum.delete_message(thread_id,message_id)
@@ -350,6 +352,8 @@ def add_image():
 
 @app.route("/image/<int:user_id>")
 def show_image(user_id):
+    require_log_in()
+
     image = users.get_image(user_id)
     if not image:
         abort(404)

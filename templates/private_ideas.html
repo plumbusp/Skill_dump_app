@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Your skills page</title>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
 <body>
     {% if session.username %}
-    <h1>Hello {{session.username}}!</h1>
-    <p>
-        Here is your skills page. You can add your new skills here,
-        and they will be visible only to you. <br>
+    <h2>Your skills page:</h2>
+    <h3>Here is your skills page. You can add your new skills here,
+        and they will be visible only to you. </h3>
 
-        <form action="/search_private_ideas" method="GET">
-            <label for = "search">Search your skills:</label><br>
+        <form action="/search_private_ideas" method="GET" class ="content_island">
+            <label for = "keyword">Search your skills:</label><br>
             <input type="text" name="keyword" maxlength="100"><br>
             <button>Search</button> <br>
         </form>
 
-        <form action="/add_skill_type" method="POST">
-            <p>Add new type of skill (reloads the page):</p>
+        <form action="/add_skill_type" method="POST" class="content_island">
+            <label for="new_skill">Add new type of skill (reloads the page):</label><br>
             <input name = "new_skill" type="text" maxlength="50"><br>
             <button>Add</button> <br>
         </form>
 
-        <form action="/add_private_idea" method="POST">
-            <p>Type of skill:</p>
+        <h4>Add a new skill:</h4>
+        <form action="/add_private_idea" method="POST" class="content_island">
+            <label for="type_of_skill">Type of skill:</label><br>
             <select name="type_of_skill">
                 <option value="None">None</option>
                 {% for skill in user_skill_types %}
-                    <option value="{{skill.name}}">{{skill.name}}</option>
+                    <option value="{{skill.names}}">{{skill.names}}</option>
                 {% endfor %}
             </select><br>
-            <label for = "idea">Write your skill here:</label><br>
-            <p>Title of a skill:</p>
+
+            <label for="idea">Title of a skill:</label><br>
             <input type="text" name="idea" maxlength="100"><br>
-            <p>What have you learned?:</p>
+
+            <label for = "content">What have you learned?:</label><br>
             <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
+
             <button>Add a skill</button> <br>
+
             {% if invalid_content %}
                 <p> Content cannot be empty or have more than 1000 characters!</p>
             {% elif invalid_title %}
@@ -40,19 +47,21 @@
             {% endif %}
         </form>
 
-        Here are your skills: <br>
+        <h3>Here are your skills:</h3>
         {% for idea in ideas %}
-            <hr>
-            <p>---------</p>
-            {% if idea.type_of_skill != "" %}
-                <p>Type of skill: {{idea.type_of_skill}}</p>
-            {% endif %}
-            <p><b>{{idea["title"]}}</b></p>
-            <p>{{idea["content"]}}</p>
-              <p>
-                <a href="/edit/{{ idea.id }}">Edit</a> |
-                <a href="/delete/{{ idea.id }}">Delete</a>
-            </p>
+            <div class="content_island">
+                {% if idea.type_of_skill != "" %}
+                    <p>Type of skill: <span class="accent_text">{{idea.type_of_skill}}</span></p>
+                {% endif %}
+                <p class = "title">{{idea["title"]}}</p>
+                <div class = "message_under_title">
+                    <p>{{idea["content"]}}</p>
+                    <p>
+                        <a href="/edit/{{ idea.id }}">Edit</a> |
+                        <a href="/delete/{{ idea.id }}">Delete</a>
+                    </p>
+                </div>
+            </div>
         {% endfor %}
     </p>
     {% else %}

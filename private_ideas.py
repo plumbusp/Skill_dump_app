@@ -6,7 +6,7 @@ import config
 import db
 
 def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_types=[]) -> str:
-    sql = """SELECT i.*, COALESCE(st.name, '') skill_type_name
+    sql = """SELECT i.*, COALESCE(st.names, '') skill_type_name
             FROM ideas i
             LEFT JOIN skill_types st ON i.type_of_skill = st.id
             WHERE i.user_id = ?"""

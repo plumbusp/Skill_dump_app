@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html>
+    
+<head>
+  <title>{{thread.title}}</title>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+
 <body>
     {% if session.user_id %}
-        <h1> {{thread.title}}</h1>
-        <p> Add new message: </p>
+        <h1> Thread: {{thread.title}}</h1>
+        <p> Add a new message: </p>
         <form action="/new_message" method="post">
-            <input type="text" name="new_message" maxlength="500" />
+            <textarea rows="4" cols="40" name="new_message" maxlength="500"></textarea><br>
             <input type = "hidden" name="thread_id" value="{{thread.id}}" />
             <button>Submit!</button>
         </form>
         <hr />
 
         {% for message in messages %}
-            
-            <a href="/user/{{message.user_id}}">{{message.username}}</a>
-            <p>({{ message.sent_at }}):</p>
-            <p>
-                {{ message.content }}
-            </p>
-            {% if message.user_id == session.user_id %}
-                <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
-                <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
-            {% endif %}
+            <div class="content_island">
+                <a href="/user/{{message.user_id}}">{{message.username}}</a>
+                <div class="content_island">
+                    <p>({{ message.sent_at }}):</p>
+                    <p>
+                        {{ message.content }}
+                    </p>
+                    {% if message.user_id == session.user_id %}
+                        <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
+                        <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
+                    {% endif %}
+                </div>
+            </div>
         {% endfor %}
         <hr />
     {% else %}

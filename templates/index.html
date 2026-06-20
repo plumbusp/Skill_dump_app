@@ -7,17 +7,11 @@
 
 <body>
   {% if session.username %}
-    <p>
-    Hello {{ session.username }}!
-    </p>
-    <form action="/to_private_ideas" method="GET">
-        <button name= "PRIVATE_IDEAS">Go to private ideas page</button> <br>
-    </form>
+    <h1>Hello {{session.username}}!</h1>
     <p>
         <a href="/logout">Log out</a>
     </p>
-    <h1>Hello {{session.username}}!</h1>>
-        <p>Dashboard:</p>
+    <p>Dashboard:</p>
     <ul>
         <li><a href="/threads">Threads</a></li>
         <li><a href="/private_ideas">Your skills page (private)</a></li>
@@ -55,7 +49,7 @@
           <p>Invalid username or password! Try again</p>
       {% endif %}
 
-    <div class="button_island">
+    <div class="content_island">
         <button>Log in</button> <br>
       </form>
       <form action="/sign_up_page" method="GET">

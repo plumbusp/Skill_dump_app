@@ -55,7 +55,7 @@ def update_image(user_id, image):
     db.execute(sql, [image, user_id])
 
 def add_type_of_skill(user_id:int, skill:str):
-    sql = "INSERT INTO skill_types (name, user_id) VALUES (?,?)"
+    sql = "INSERT INTO skill_types (names, user_id) VALUES (?,?)"
     db.execute(sql,[skill, user_id])
 
 def get_users_skills(user_id:int):
@@ -66,23 +66,19 @@ def get_total_skills(user_id:int)-> int:
     sql = "SELECT COUNT(*) count FROM ideas WHERE user_id = ?"
     return db.query_one(sql, [user_id])["count"]
 
-def get_skill_stats(user_id:int)->list:
-    sql = """SELECT COALESCE(st.name, 'Uncategorized') skill_type_name, COUNT(i.id) total
-            FROM ideas i
-            LEFT JOIN skill_types st ON i.type_of_skill = st.id
-            WHERE i.user_id = ?
-            GROUP BY st.id
-            ORDER BY total DESC"""
-    result = db.query(sql, [user_id])
-    total_count = 0
+def get_skill_stats(user_id: int) -> list:
+    sql = """SELECT COALESCE(st.names, 'Uncategorized') skill_type_name, COUNT(i.id) total
+             FROM ideas i
+             LEFT JOIN skill_types st ON i.type_of_skill = st.id
+             WHERE i.user_id = ?
+             GROUP BY st.id
+             ORDER BY total DESC"""
+    result = list(db.query(sql, [user_id]))
 
-    for row in result:
-        total_count += int(row["total"])
-    
-    one_percent = 100/total_count if total_count else 0
+    total_count = sum(int(row["total"]) for row in result)
+    one_percent = 100 / total_count if total_count else 0
 
-    strings = []
-    for row in result:
-        strings.append(
-             f"{row['skill_type_name']} has {row['total']} appearances and is {one_percent*int(row['total']):.1f}% of all skills")
-    return strings
+    return [
+        f"{row['skill_type_name']} has {row['total']} appearances and is {one_percent * int(row['total']):.1f}% of all skills"
+        for row in result
+    ]
