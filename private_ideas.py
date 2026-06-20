@@ -20,9 +20,8 @@ def get_idea(idea_id)-> dict:
     return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
 
 
-
-def update_idea(idea_id:int, content:str, title:str):
-    db.execute("UPDATE ideas SET title = ?, content = ? WHERE id = ?", [title, content, idea_id])
+def update_idea(idea_id:int, content:str, title:str, type_of_skill:str):
+    db.execute("UPDATE ideas SET title = ?, content = ?, type_of_skill = ? WHERE id = ?", [title, content, type_of_skill, idea_id])
 
 def delete_idea(idea_id:int):
     db.execute("DELETE FROM ideas WHERE id = ?", [idea_id])

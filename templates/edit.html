@@ -7,14 +7,22 @@
 <body>
   {% if for_idea %}
     <form action="/edit/{{ idea.id }}" method="post">
-      <p>
-        Title:<br />
-        <input name="edited_title" value="{{ idea.title }}" />
-        <br />
-        Content:<br />
-        <textarea name="edited_content" rows="5" cols="40">{{ idea.title }}</textarea>
-      </p>
-      <input type="submit" value="Submit!" />
+        <p>Type of skill:</p>
+        <select name="edited_type_of_skill">
+            <option value="None">None</option>
+            {% for skill in user_skill_types %}
+                {% if skill.names == idea.type_of_skill %}
+                    <option value="{{skill.names}}" selected>{{skill.names}}</option>
+                {% else %}
+                     <option value="{{skill.names}}">{{skill.names}}</option>
+                {% endif %}
+            {% endfor %}
+        </select><br>
+        <p>Title:</p>
+        <input name="edited_title" value="{{ idea.title }}" /><br>
+        <p>Content:</p>
+        <textarea name="edited_content" rows="5" cols="40">{{ idea.content }}</textarea><br>
+        <input type="submit" value="Submit!" />
     </form>
     
   {% elif for_message %}

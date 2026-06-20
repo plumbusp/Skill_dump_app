@@ -136,14 +136,17 @@ def edit_idea(idea_id):
     require_log_in()
 
     idea = private_ideas.get_idea(idea_id)
+    user_skill_types = users.get_users_skills(session["user_id"])
 
     if request.method == "GET":
-        return render_template("edit.html", for_idea=True, for_message=False, idea=idea)
+        return render_template("edit.html", for_idea=True, for_message=False, idea=idea, user_skill_types=user_skill_types)
 
     if request.method == "POST":
         new_content = request.form["edited_content"]
         new_title = request.form["edited_title"]
-        private_ideas.update_idea(int(idea_id),new_content, new_title)
+        type_of_skill= request.form["edited_type_of_skill"]
+        print("SCUEES")
+        private_ideas.update_idea(int(idea_id),new_content, new_title, type_of_skill)
         return redirect("/private_ideas")
     return "what is it then?? ERROR!"
 
