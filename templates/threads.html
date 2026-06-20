@@ -34,7 +34,10 @@
             <p> There are total of {{thread.total}} messages in this thread.</p>
             <hr />
         {% endfor %}
-        <p></p>
+        <p> <a href= "/threads/{{page-1}}">
+            &lt &lt</a> Page {{page}}/{{page_count}} 
+            <a href= "/threads/{{page+1}}"> &gt &gt</a>
+        </p>
     {% else %}
         <p>You are not logged in! Please log in to see threads.</p>
         <a href="/" >Log in</a>

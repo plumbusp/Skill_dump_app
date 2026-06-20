@@ -18,13 +18,14 @@
     </ul>
     <hr>
     <h3>Stats on the private ideas:</h3>
-    <p>Total number of skills: {{ total_skills }}</p>
-    <br>
-    <p>Stats:</p>
-    {% for stat in skill_stats %}
-        <p>{{ stat }}</p>
-    {% endfor %}
-
+    <p class = "title">Total number of skills: {{ total_skills }}</p>
+    <p class = "title" >Stats:</p>
+    <div class="content_island">
+      {% for stat in skill_stats %}
+          <p>{{ stat }}</p>
+      {% endfor %}
+    </div>
+    <hr>
     <h4>Profile picture:</h4>
     {% if user and user.has_image %}
       <img src="/image/{{ user.id }}" />

@@ -9,6 +9,7 @@ import os
 import sys
 from werkzeug.datastructures import FileStorage
 from configparser import ConfigParser # for local testing only
+import math
 
 app = Flask(__name__)
 ### creating all tables in databse:
@@ -27,6 +28,9 @@ if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
 else:
     initialized = False
     app.secret_key = SECRET_KEY 
+
+
+page_size = 10
 
 #### HELPER/ GENERAL METHODS ####
 def require_log_in():
@@ -216,10 +220,18 @@ def show_home(user=None):
 #### THREADS (PUBLIC) ####
 
 @app.route("/threads", methods = ["GET"])
-def show_threads():
+@app.route("/threads/<int:page>", methods = ["GET"])
+def show_threads(page=1):
     # Log in status is handled inside the html file
-    threads = forum.get_threads()
-    return render_template("threads.html", threads=threads)
+    thread_count = forum.thread_count()
+    page_count = math.ceil(thread_count/page_size)
+    if page < 1:
+        page = 1
+    elif page > page_count:
+        page = page_count
+
+    threads = forum.get_threads(page, page_size)
+    return render_template("threads.html", threads=threads, page=page,page_count=page_count)
 
 @app.route("/search_threads", methods =["GET"])
 def search_threads():
