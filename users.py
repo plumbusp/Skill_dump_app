@@ -54,9 +54,15 @@ def update_image(user_id, image):
     sql = "UPDATE log_in_info SET image = ? WHERE id = ?"
     db.execute(sql, [image, user_id])
 
-def add_type_of_skill(user_id:int, skill:str):
+def add_type_of_skill(user_id:int, skill:str)-> bool:
     sql = "INSERT INTO skill_types (names, user_id) VALUES (?,?)"
-    db.execute(sql,[skill, user_id])
+    try:
+        db.execute(sql,[skill, user_id])
+        return True
+    except sqlite3.IntegrityError: # UNIQUE constraint violations
+        db.close_current_connection()
+        print("I close current connection!")
+        return False
 
 def get_users_skills(user_id:int):
     sql = "SELECT * FROM skill_types WHERE user_id = ?"

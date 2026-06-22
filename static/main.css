@@ -60,3 +60,7 @@ select{
 .message_under_title{
   margin-left: 0.5rem;
 }
+.exception_message{
+  color: rgb(185, 79, 50);
+  stroke: black;
+}

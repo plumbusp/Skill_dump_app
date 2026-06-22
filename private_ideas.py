@@ -5,13 +5,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 
-def get_private_ideas(invalid_title=False, invalid_content=False, user_skill_types=[]) -> str:
-    sql = """SELECT i.*, COALESCE(st.names, '') skill_type_name
+def get_private_ideas( page, page_size, page_count, user_skill_types=None) -> str:
+    sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i
-            LEFT JOIN skill_types st ON i.type_of_skill = st.names
-            WHERE i.user_id = ?"""
-    ideas = db.query(sql, [session["user_id"]])
-    return render_template("private_ideas.html", ideas=ideas, invalid_title=invalid_title, invalid_content=invalid_content,user_skill_types=user_skill_types)
+            WHERE i.user_id = ?
+            ORDER BY i.id DESC
+            LIMIT ? OFFSET ?"""
+    limit = page_size
+    offset = page_size * (page-1)
+    ideas = db.query(sql, [session["user_id"], limit, offset])
+    return render_template("private_ideas.html", page=page, page_count=page_count, ideas=ideas,user_skill_types=user_skill_types)
+
+def ideas_count()-> int:
+    sql = """SELECT COUNT(id) AS count FROM ideas WHERE user_id = ?"""
+    return db.query_one(sql, [session["user_id"]])["count"]
 
 def add_private_idea(idea: str, content:str, type_of_skill:str):
     db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])

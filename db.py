@@ -13,7 +13,11 @@ def get_connection():
     connection.execute("PRAGMA foreign_keys = ON")
     connection.commit()
     connection.row_factory = sqlite3.Row
+    g.connection = connection
     return connection
+
+def close_current_connection():
+    g.connection.close()
 
 def execute(sql, params=[]):
     """ data base same to execute in and """
@@ -22,6 +26,7 @@ def execute(sql, params=[]):
     connection.commit()
     g.last_insert_id = cursor.lastrowid
     connection.close()
+    print("Closed connection")
 
 def last_insert_id():
     return g.last_insert_id    

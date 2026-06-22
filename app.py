@@ -1,15 +1,16 @@
+import os
+import sys
 import sqlite3
-from flask import Flask, session, abort,make_response
+import math
+from flask import Flask, session, abort, make_response
 from flask import redirect, render_template, request
+from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import db
 import private_ideas, forum, users
-import os
-import sys
 from werkzeug.datastructures import FileStorage
 from configparser import ConfigParser # for local testing only
-import math
 
 app = Flask(__name__)
 ### creating all tables in databse:
@@ -30,7 +31,7 @@ else:
     app.secret_key = SECRET_KEY 
 
 
-page_size = 10
+page_size = 2
 
 #### HELPER/ GENERAL METHODS ####
 def require_log_in():
@@ -106,11 +107,16 @@ def log_out():
 
 #### IDEAS (PRIVATE) ####
 @app.route("/private_ideas")
-def show_private_ideas():
+@app.route("/private_ideas/<int:page>")
+def show_private_ideas(page=1):
     require_log_in()
 
+    ideas_count = private_ideas.ideas_count()
+    page_count = math.ceil(ideas_count/page_size)
+    page = page_validity_helper(page, page_count)
+
     user_skill_types = users.get_users_skills(session["user_id"])
-    return private_ideas.get_private_ideas(user_skill_types=user_skill_types)
+    return private_ideas.get_private_ideas(page, page_size, page_count, user_skill_types=user_skill_types)
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
@@ -127,9 +133,11 @@ def add_idea():
     clean_idea = idea.strip()
     clean_content = content.strip()
     if len(clean_idea) > 100 or len(clean_idea) == 0:
-        return private_ideas.get_private_ideas(invalid_title=True)
+        flash("The title cannot be empty or more than 100 char!", "new_idea")
+        return redirect("/private_ideas")
     elif len(clean_content) > 1000 or len(clean_content) == 0:
-        return private_ideas.get_private_ideas(invalid_content=True)
+        flash("The content cannot be empty or more than 1000 char!", "new_idea")
+        return redirect("/private_ideas")
 
 
     private_ideas.add_private_idea(idea, content, type_of_skill)
@@ -194,7 +202,9 @@ def add_skill():
     skill = request.form["new_skill"]
     if len(skill.strip()) == 0 or len(skill.strip()) > 50:
         return "Invalid skill input! The skill can't be empty or longer than 50 char."
-    users.add_type_of_skill(session["user_id"], skill)
+    passes = users.add_type_of_skill(session["user_id"], skill)
+    if not passes:
+        flash("The skill name is already taken!", "skills")
     print("SKILL ", skill)
     return redirect("/private_ideas")
 
@@ -216,6 +226,13 @@ def show_home(user=None):
         return render_template("index.html", valid_login = True)
 
 
+def page_validity_helper(current_page, total_pages_count)-> int:
+        if current_page < 1:
+            return 1
+        elif current_page > total_pages_count:
+            return total_pages_count
+        else:
+            return current_page
 
 #### THREADS (PUBLIC) ####
 
@@ -224,11 +241,9 @@ def show_home(user=None):
 def show_threads(page=1):
     # Log in status is handled inside the html file
     thread_count = forum.thread_count()
+
     page_count = math.ceil(thread_count/page_size)
-    if page < 1:
-        page = 1
-    elif page > page_count:
-        page = page_count
+    page = page_validity_helper(page, page_count)
 
     threads = forum.get_threads(page, page_size)
     return render_template("threads.html", threads=threads, page=page,page_count=page_count)
