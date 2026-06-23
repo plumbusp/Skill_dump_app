@@ -22,9 +22,8 @@ if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
     con_par = ConfigParser()
     con_par.read("config.cfg")
     file = con_par["secret-key"]["secret_key"]
-    print(file)
     if not file:
-        print("Secret Key is not set!", flush=True)
+        #print("Secret Key is not set!", flush=True)
         sys.exit(1)
     initialized = False
     app.secret_key = file
@@ -63,13 +62,13 @@ def show_home():
         total_skills = users.get_total_skills(session["user_id"])
         skill_stats = users.get_skill_stats(session["user_id"])
         user = users.get_user(session["user_id"])
-        return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
+        return render_template("index.html", user=user, total_skills=total_skills, skill_stats=skill_stats)
     else:
         filled = {}
         username = request.args.get("username")
         if username:
             filled["username"] = username
-        return render_template("index.html",filled=filled)
+        return render_template("index.html", filled=filled)
 
 
 def page_validity_helper(current_page, total_pages_count)-> int:
@@ -97,10 +96,10 @@ def sign_up():
 
     if password1 != password2:
         flash("Passwords don't match!", "sign_up_exception")
-        return redirect(url_for("sign_up_page",username=username))
+        return redirect(url_for("sign_up_page", username=username))
     elif password1.strip() == "":
         flash("A password cannot be empty!", "sign_up_exception")
-        return redirect(url_for("sign_up_page",username=username))
+        return redirect(url_for("sign_up_page", username=username))
     password_hash = generate_password_hash(password1)
 
     try:
@@ -109,7 +108,7 @@ def sign_up():
     except sqlite3.IntegrityError:
         flash("User with this username already exists", "sign_up_exception")
         db.close_current_connection()
-        return redirect(url_for("sign_up_page",username=username))
+        return redirect(url_for("sign_up_page", username=username))
 
     # succesfull sign up
     #SESSION
@@ -127,10 +126,10 @@ def log_in():
     filled = {}
 
     if str(username).strip() == "":
-        flash("Username cannot be empty!","log_in_exception")
+        flash("Username cannot be empty!", "log_in_exception")
         return redirect("/")
     elif str(password).strip() == "":
-        flash("Password cannot be empty!","log_in_exception")
+        flash("Password cannot be empty!", "log_in_exception")
         filled["username"] = username
         return redirect(url_for("show_home", username=username))
 
@@ -141,8 +140,8 @@ def log_in():
         return redirect(url_for("show_home", username=username))
     
     if not password:
-        flash("Invalid password","log_in_exception")
-    elif check_password_hash(result[0][1],password):
+        flash("Invalid password", "log_in_exception")
+    elif check_password_hash(result[0][1], password):
         #SESSION
         session["username"] = username
         session["csrf_token"] = secrets.token_hex(16)
@@ -184,9 +183,9 @@ def show_private_ideas(page=1):
     page_count = math.ceil(ideas_count/page_size)
     page = page_validity_helper(page, page_count)
 
-    ideas = private_ideas.get_private_ideas(page, page_size, search_keyword=search_keyword,search_skill_type=search_skill_type)
+    ideas = private_ideas.get_private_ideas(page, page_size, search_keyword=search_keyword, search_skill_type=search_skill_type)
     user_skill_types = users.get_users_skills(session["user_id"])
-    return render_template("private_ideas.html", search_keyword=search_keyword,search_skill_type=search_skill_type, page=page, page_count=page_count, ideas=ideas,user_skill_types=user_skill_types)
+    return render_template("private_ideas.html", search_keyword=search_keyword, search_skill_type=search_skill_type, page=page, page_count=page_count, ideas=ideas, user_skill_types=user_skill_types)
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
@@ -228,7 +227,7 @@ def edit_idea(idea_id):
         new_content = request.form["edited_content"]
         new_title = request.form["edited_title"]
         type_of_skill= request.form["edited_type_of_skill"]
-        private_ideas.update_idea(int(idea_id),new_content, new_title, type_of_skill)
+        private_ideas.update_idea(int(idea_id), new_content, new_title, type_of_skill)
         return redirect("/private_ideas")
     
     return "what is it then?? ERROR!"
@@ -241,7 +240,7 @@ def delete_idea(idea_id):
     idea = private_ideas.get_idea(idea_id)
 
     if request.method == "GET":
-        return render_template("delete.html",for_idea=True, for_message=False, idea=idea)
+        return render_template("delete.html", for_idea=True, for_message=False, idea=idea)
 
     if request.method == "POST":
         check_csrf()
@@ -257,8 +256,6 @@ def search_private_ideas():
 
     keyword = request.args.get("search_keyword") or None
     skill_type = request.args.get("search_skill_type") or None
-    print("KEyword ", keyword)
-    print("Type of skill ", skill_type)
     
     return redirect(url_for("show_private_ideas", search_keyword= keyword, search_skill_type=skill_type))
 
@@ -291,7 +288,7 @@ def show_threads(page=1):
     page = page_validity_helper(page, page_count)
 
     threads = forum.get_threads(page, page_size)
-    return render_template("threads.html", threads=threads, page=page,page_count=page_count)
+    return render_template("threads.html", threads=threads, page=page, page_count=page_count)
 
 @app.route("/search_threads", methods =["GET"])
 def search_threads():
@@ -406,7 +403,6 @@ def show_user(user_id):
     if not user:
         abort(404)
     last_messages = users.get_last_messages(user_id)
-    print("last messages: ", last_messages, flush=True)
     return render_template("user.html", user=user, last_messages=last_messages)
 
 ### USER IMAGES ###

@@ -9,8 +9,6 @@ def get_private_ideas(page, page_size, search_keyword=None, search_skill_type=No
     limit = page_size
     offset = page_size * (page-1)
     params = [session["user_id"]]
-    print("search_keyword", search_keyword)
-    print("search_skill_type",search_skill_type)
     if search_keyword == None and search_skill_type == None:
         sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i

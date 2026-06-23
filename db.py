@@ -24,7 +24,6 @@ def execute(sql, params=[]):
     connection.commit()
     g.last_insert_id = cursor.lastrowid
     connection.close()
-    print("Closed connection")
 
 def last_insert_id():
     return g.last_insert_id    

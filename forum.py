@@ -50,7 +50,6 @@ def get_last_thread_id():
 def add_message_to_thread(content, thread_id):
     sql = """INSERT INTO messages (content, sent_at, user_id, username, thread_id)
         VALUES (?, datetime('now'), ?, ?, ?)"""
-    print(f"Username {session["username"]}")
     db.execute(sql, [content, session["user_id"], session["username"], thread_id])
 
 def get_messages(thread_id):

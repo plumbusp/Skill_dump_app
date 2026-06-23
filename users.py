@@ -53,7 +53,6 @@ def add_type_of_skill(user_id:int, skill:str)-> bool:
         return True
     except sqlite3.IntegrityError: # UNIQUE constraint violations
         db.close_current_connection()
-        print("I close current connection!")
         return False
 
 def get_users_skills(user_id:int):
