@@ -19,28 +19,28 @@ def get_private_ideas(page, page_size, search_keyword=None, search_skill_type=No
             LIMIT ? OFFSET ?"""
         
     elif search_skill_type != None and search_keyword != None:
-         sql = """SELECT i.title, i.content, i.type_of_skill, i.id
+        sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i
             WHERE i.user_id = ? AND i.type_of_skill = ? AND title LIKE ?
             ORDER BY i.id DESC
             LIMIT ? OFFSET ?"""
-         params.append(search_skill_type)
-         params.append(f"%{search_keyword}%")
+        params.append(search_skill_type)
+        params.append(f"%{search_keyword}%")
 
     elif search_skill_type != None:
-         sql = """SELECT i.title, i.content, i.type_of_skill, i.id
+        sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i
             WHERE i.user_id = ? AND i.type_of_skill = ?
             ORDER BY i.id DESC
             LIMIT ? OFFSET ?"""
-         params.append(search_skill_type)
+        params.append(search_skill_type)
     else:
-         sql = """SELECT i.title, i.content, i.type_of_skill, i.id
+        sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i
             WHERE i.user_id = ? AND title LIKE ?
             ORDER BY i.id DESC
             LIMIT ? OFFSET ?"""
-         params.append(f"%{search_keyword}%")
+        params.append(f"%{search_keyword}%")
     params.extend([limit, offset])
 
     ideas = db.query(sql, params)
@@ -65,7 +65,7 @@ def add_private_idea(idea: str, content:str, type_of_skill:str):
     db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])
 
 def get_idea(idea_id)-> dict:
-    return db.query("SELECT * FROM ideas WHERE id = ?", [idea_id])[0]
+    return db.query("SELECT i.id, i.title, i.content, i.type_of_skill FROM ideas AS i WHERE id = ?", [idea_id])[0]
 
 def update_idea(idea_id:int, content:str, title:str, type_of_skill:str):
     db.execute("UPDATE ideas SET title = ?, content = ?, type_of_skill = ? WHERE id = ?", [title, content, type_of_skill, idea_id])
@@ -74,7 +74,7 @@ def delete_idea(idea_id:int):
     db.execute("DELETE FROM ideas WHERE id = ?", [idea_id])
 
 def find_matches(keyword:str)-> list:
-    return db.query("SELECT * FROM ideas WHERE title LIKE ? AND user_id = ?", [f"%{keyword}%", session["user_id"]])
+    return db.query("SELECT  i.id, i.title, i.content, i.type_of_skill FROM ideas AS i WHERE title LIKE ? AND user_id = ?", [f"%{keyword}%", session["user_id"]])
 
 def find_matches_by_skill_type(type_of_skill:str)-> list:
-    return db.query("SELECT * FROM ideas WHERE type_of_skill LIKE ? AND user_id = ?", [f"%{type_of_skill}%", session["user_id"]])
+    return db.query("SELECT  i.id, i.title, i.content, i.type_of_skill FROM ideas AS i WHERE type_of_skill LIKE ? AND user_id = ?", [f"%{type_of_skill}%", session["user_id"]])

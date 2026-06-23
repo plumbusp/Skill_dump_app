@@ -10,33 +10,25 @@ short_list_length = 3
 
 def get_user(user_id):
     sql = """SELECT id, usernames, image IS NOT NULL has_image
-             FROM log_in_info 
-             WHERE id = ?"""
+        FROM log_in_info 
+        WHERE id = ?"""
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
 def get_messages(user_id):
-    sql = """SELECT m.id,
-                m.thread_id,
-                t.title thread_title,
-                m.sent_at,
-                m.content
-         FROM threads t, messages m
-         WHERE t.id = m.thread_id AND
-               m.user_id = ?
-         ORDER BY m.sent_at DESC"""
+    sql = """SELECT m.id, m.thread_id, t.title thread_title,
+        m.sent_at, m.content
+        FROM threads t, messages m
+        WHERE t.id = m.thread_id AND m.user_id = ?
+        ORDER BY m.sent_at DESC"""
     return db.query(sql, [user_id])
 
 def get_last_messages(user_id):
-    sql ="""SELECT m.id,
-                m.thread_id,
-                t.title thread_title,
-                m.sent_at,
-                m.content
-         FROM threads t, messages m
-         WHERE t.id = m.thread_id AND
-               m.user_id = ?
-         ORDER BY m.sent_at DESC"""
+    sql ="""SELECT m.id, m.thread_id, t.title thread_title,
+        m.sent_at, m.content
+        FROM threads t, messages m
+        WHERE t.id = m.thread_id AND m.user_id = ?
+        ORDER BY m.sent_at DESC"""
     last_messages = db.query(sql, [user_id])
     if len(last_messages) < short_list_length:
         return last_messages
@@ -65,20 +57,20 @@ def add_type_of_skill(user_id:int, skill:str)-> bool:
         return False
 
 def get_users_skills(user_id:int):
-    sql = "SELECT * FROM skill_types WHERE user_id = ?"
+    sql = "SELECT names FROM skill_types WHERE user_id = ?"
     return db.query(sql, [user_id])
 
 def get_total_skills(user_id:int)-> int:
-    sql = "SELECT COUNT(*) count FROM ideas WHERE user_id = ?"
+    sql = "SELECT COUNT(id) count FROM ideas WHERE user_id = ?"
     return db.query_one(sql, [user_id])["count"]
 
 def get_skill_stats(user_id: int) -> list:
     sql = """SELECT COALESCE(st.names, 'Uncategorized') skill_type_name, COUNT(i.id) total
-             FROM ideas i
-             LEFT JOIN skill_types st ON i.type_of_skill = st.names
-             WHERE i.user_id = ?
-             GROUP BY st.id
-             ORDER BY total DESC"""
+        FROM ideas i
+        LEFT JOIN skill_types st ON i.type_of_skill = st.names
+        WHERE i.user_id = ?
+        GROUP BY st.id
+        ORDER BY total DESC"""
     result = list(db.query(sql, [user_id]))
 
     total_count = sum(int(row["total"]) for row in result)

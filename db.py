@@ -1,12 +1,10 @@
 import sqlite3
 from flask import g
 def create_app_tables():
-    print("1 Success!")
     with open("schema.sql") as file:
         con = sqlite3.connect("database.db")
         con.executescript(file.read())
         con.close()
-        print("Success!")
 
 def get_connection():
     connection = sqlite3.connect("database.db")
