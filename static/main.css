@@ -62,7 +62,10 @@ select{
   margin: 0.5rem;
   padding: 0.25rem;
 }
-
+.message_island{
+  margin: 0.2rem;
+  padding: 0.1rem;
+}
 .accent_text{
   color: rgb(60, 40, 80);
   font-style: italic;
