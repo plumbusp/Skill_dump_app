@@ -49,6 +49,11 @@
                 {{ message }}
             </p>
     {% endfor %}
+    {% for message in get_flashed_messages(category_filter=["image_success"]) %}
+            <p class = "success_message">
+                {{ message }}
+            </p>
+    {% endfor %}
 
 
   {% else %}

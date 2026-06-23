@@ -76,5 +76,11 @@ select{
 }
 .exception_message{
   color: rgb(185, 79, 50);
-  stroke: black;
+  stroke-width: 2px;
+  stroke: rgb(129, 12, 12);
+}
+.success_message{
+  color: rgb(39, 199, 39);
+  stroke-width: 2px;
+  stroke: rgb(58, 145, 29);
 }

@@ -400,7 +400,7 @@ def add_image():
 
     user_id = session["user_id"]
     users.update_image(user_id, image)
-    user = users.get_user(user_id)
+    flash("Profile picture was updated successfully!", "image_success")
     return redirect("/")
     
 
