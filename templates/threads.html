@@ -8,6 +8,14 @@
 
 <body>
     {% if session.username %}
+        <div class = "top_bar">
+            <a class = "top_bar_link" href="/">Home/Profile</a>
+            <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
+            <a class = "top_bar_link" href="/threads">Threads</a>
+        </div>
+        
+        <h1> Threads </h1>
+
         <form action="/create_thread" method="post"> 
             <h4>Create a new thread:</h4>
             <div class="content_island">

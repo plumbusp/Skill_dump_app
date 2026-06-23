@@ -8,6 +8,12 @@
 
 <body>
     {% if session.user_id %}
+        <div class = "top_bar">
+        <a class = "top_bar_link" href="/">Home/Profile</a>
+        <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
+        <a class = "top_bar_link" href="/threads">Threads</a>
+        </div>
+
         <h1> Thread: {{thread.title}}</h1>
         <p> Add a new message: </p>
         <form action="/new_message" method="post">

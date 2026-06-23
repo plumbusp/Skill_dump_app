@@ -7,6 +7,13 @@
 
 <body>
   {% if session.username %}
+
+    <div class = "top_bar">
+      <a class = "top_bar_link" href="/">Home/Profile</a>
+      <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
+      <a class = "top_bar_link" href="/threads">Threads</a>
+    </div>
+
     <h1>Hello {{session.username}}!</h1>
     <p>
         <a href="/logout">Log out</a>
@@ -19,8 +26,8 @@
     <hr>
     <h3>Stats on the private ideas:</h3>
     <p class = "title">Total number of skills: {{ total_skills }}</p>
-    <p class = "title" >Stats:</p>
     <div class="content_island">
+      <p class = "title" >Stats:</p>
       {% for stat in skill_stats %}
           <p>{{ stat }}</p>
       {% endfor %}

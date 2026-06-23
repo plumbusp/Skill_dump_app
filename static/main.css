@@ -1,8 +1,22 @@
 @font-face {font-family: StudyDaily; src: url('Study-Daily.otf');}
 body {
-  max-width: 50em;
   font-family: StudyDaily;
   background-color: rgb(230, 250, 225);
+}
+
+.top_bar{
+  position: sticky;
+  margin: 1rem;
+  padding: 1rem;
+  top: 10px;
+  background-color: rgb(55, 105, 65);
+}
+
+.top_bar_link{
+  font-size: larger;
+  font-style: normal;
+  color:rgb(178, 102, 2);
+  margin: 0.35rem;
 }
 
 p, h1, h2, h3, h4{

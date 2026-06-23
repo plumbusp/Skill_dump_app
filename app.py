@@ -143,7 +143,7 @@ def show_private_ideas(page=1):
 
     if ideas_count == 0:
         flash("There is no entries that satisfy given search parameters", "private_ideas_search_exception")
-        
+
     page_count = math.ceil(ideas_count/page_size)
     page = page_validity_helper(page, page_count)
 
@@ -213,13 +213,6 @@ def delete_idea(idea_id):
 
 @app.route("/search_private_ideas", methods =["GET"])
 def search_private_ideas():
-    # require_log_in()
-
-    # keyword =request.args.get("keyword")
-    # if not keyword:
-    #     return redirect("/private_ideas")
-    
-    # matches = private_ideas.find_matches(keyword)
     require_log_in()
 
     keyword = request.args.get("search_keyword") or None
@@ -228,18 +221,6 @@ def search_private_ideas():
     print("Type of skill ", skill_type)
     
     return redirect(url_for("show_private_ideas", search_keyword= keyword, search_skill_type=skill_type))
-
-
-# @app.route("/private_ideas_by_skill_type", methods = ["GET"])
-# def private_ideas_by_skill_type():
-#     require_log_in()
-
-#     skill_type = request.form["display_skill_type"]
-#     if skill_type == None:
-#         skill_type = ""
-#     matches = private_ideas.find_matches_by_skill_type(skill_type)
-#     return render_template("private_ideas.html", ideas=matches)
-
 
 
 #### SKILLS ####
@@ -255,7 +236,6 @@ def add_skill():
         flash("The skill name is already taken!", "skills")
 
     return redirect("/private_ideas")
-
 
 
 #### THREADS (PUBLIC) ####
