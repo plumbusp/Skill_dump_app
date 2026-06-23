@@ -58,7 +58,11 @@ def show_home():
         user = users.get_user(session["user_id"])
         return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
     else:
-        return render_template("index.html")
+        filled = {}
+        username = request.args.get("username")
+        if username:
+            filled["username"] = username
+        return render_template("index.html",filled=filled)
 
 
 def page_validity_helper(current_page, total_pages_count)-> int:
@@ -72,7 +76,11 @@ def page_validity_helper(current_page, total_pages_count)-> int:
 ### SIGNING IN/ LOGGING IN ####
 @app.route("/sign_up_page")
 def sign_up_page():
-    return render_template("sign_up_page.html")
+    username = request.args.get("username")
+    filled = {}
+    if username:
+        filled["username"] = username
+    return render_template("sign_up_page.html", filled=filled)
 
 @app.route("/sign_up", methods=["POST"])
 def sign_up():
@@ -81,7 +89,7 @@ def sign_up():
     password2 = request.form["password2"]
     if password1 != password2:
         flash("Passwords don't match!", "sign_up_exception")
-        return redirect("/sign_up_page")
+        return redirect(url_for("sign_up_page",username=username))
     password_hash = generate_password_hash(password1)
 
     try:
@@ -89,7 +97,8 @@ def sign_up():
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError:
         flash("User with this username already exists", "sign_up_exception")
-        return redirect("/sign_up_page")
+        db.close_current_connection()
+        return redirect(url_for("sign_up_page",username=username))
 
     # succesfull sign up
     #SESSION
@@ -104,15 +113,21 @@ def sign_up():
 def log_in():
     username = request.form.get("username") # getting a name form the submitted form
     password = request.form.get("password")
+    filled = {}
 
-    if str(username).strip() == "" or str(password).strip() == "":
-        flash("Username and/or password cannot be empty!","log_in_exception")
+    if str(username).strip() == "":
+        flash("Username cannot be empty!","log_in_exception")
         return redirect("/")
+    elif str(password).strip() == "":
+        flash("Password cannot be empty!","log_in_exception")
+        filled["username"] = username
+        return redirect(url_for("show_home", username=username))
 
     result = db.query("SELECT usernames, passwords FROM log_in_info WHERE usernames=?", (username ,))
     if result == []:
         flash("No user with this username has been found. Sign up?","log_in_exception")
-        return redirect("/")
+        filled["username"] = username
+        return redirect(url_for("show_home", username=username))
     
     if not password:
         flash("Invalid password","log_in_exception")
@@ -123,8 +138,9 @@ def log_in():
         session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
     else: 
         flash("Invalid password","log_in_exception")
-    
-    return redirect("/")
+
+    filled["username"] = username
+    return redirect(url_for("show_home", username=username))
     
 @app.route("/logout")
 def log_out():
