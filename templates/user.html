@@ -13,7 +13,7 @@
     <p> Last sent public ideas: </p>
     {% for message in last_messages %}
         <p><i>{{message.sent_at}}</i></p>
-        <p>{{message.content}}</p>
+        <p>{{message.content | show_lines}}</p>
     {% endfor %}
 </body>
 

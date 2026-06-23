@@ -3,6 +3,7 @@ import sys
 import sqlite3
 import math
 import secrets
+import markupsafe
 from flask import Flask, session, abort, make_response
 from flask import redirect, render_template, request, url_for
 from flask import flash
@@ -47,6 +48,12 @@ def check_csrf():
     if token != session["csrf_token"]:
         abort(403)
     
+@app.template_filter()
+def show_lines(content):
+    content = str(markupsafe.escape(content))
+    content = content.replace("\n", "<br />")
+    return markupsafe.Markup(content)
+
 #####
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
@@ -87,8 +94,12 @@ def sign_up():
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
+
     if password1 != password2:
         flash("Passwords don't match!", "sign_up_exception")
+        return redirect(url_for("sign_up_page",username=username))
+    elif password1.strip() == "":
+        flash("A password cannot be empty!", "sign_up_exception")
         return redirect(url_for("sign_up_page",username=username))
     password_hash = generate_password_hash(password1)
 

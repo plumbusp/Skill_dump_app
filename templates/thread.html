@@ -30,7 +30,7 @@
                 <div class="content_island">
                     <p>({{ message.sent_at }}):</p>
                     <p>
-                        {{ message.content }}
+                        {{ message.content | show_lines}}
                     </p>
                     {% if message.user_id == session.user_id %}
                         <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
