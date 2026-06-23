@@ -38,10 +38,33 @@ def require_log_in():
     if "user_id" not in session:
         abort(403)
 
+
+#####
+### HOME (NAVIGATION) ####
+@app.route("/", methods = ["GET"])
+def show_home():
+    # Log in status is handled inside the html file
+    if "user_id" in session:
+        total_skills = users.get_total_skills(session["user_id"])
+        skill_stats = users.get_skill_stats(session["user_id"])
+        user = users.get_user(session["user_id"])
+        return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
+    else:
+        return render_template("index.html")
+
+
+def page_validity_helper(current_page, total_pages_count)-> int:
+        if current_page < 1:
+            return 1
+        elif current_page > total_pages_count:
+            return total_pages_count
+        else:
+            return current_page
+
 ### SIGNING IN/ LOGGING IN ####
 @app.route("/sign_up_page")
 def sign_up_page():
-    return render_template("sign_up_page.html", passwords_match = True)
+    return render_template("sign_up_page.html")
 
 @app.route("/sign_up", methods=["POST"])
 def sign_up():
@@ -49,59 +72,56 @@ def sign_up():
     password1 = request.form["password1"]
     password2 = request.form["password2"]
     if password1 != password2:
-        return render_template("sign_up_page.html", passwords_match = False)
+        flash("Passwords don't match!", "sign_up_exception")
+        return redirect("/sign_up_page")
     password_hash = generate_password_hash(password1)
 
     try:
         sql = "INSERT INTO log_in_info (usernames, passwords) VALUES (?, ?)"
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError:
-        return render_template("sign_up_page.html", already_exists= True)
+        flash("User with this username already exists", "sign_up_exception")
+        return redirect("/sign_up_page")
 
     # succesfull sign up
     #SESSION
     session["username"] = username
     session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
 
-    return render_template("index.html")
+    return redirect("/")
 
 
 @app.route("/log_in", methods=["POST"])
 def log_in():
     username = request.form.get("username") # getting a name form the submitted form
     password = request.form.get("password")
-    print("Username ", username)
-    print("Password ", password)
+
     if str(username).strip() == "" or str(password).strip() == "":
-        print("Invalid username or password")
-        return render_template("index.html",valid_login=False)
+        flash("Username and/or password cannot be empty!","log_in_exception")
+        return redirect("/")
 
     result = db.query("SELECT usernames, passwords FROM log_in_info WHERE usernames=?", (username ,))
     if result == []:
-        return render_template("index.html",valid_login=False)
-    elif not password:
-        print(" not password")
-        return render_template("index.html",valid_login=False)
-       
-    if check_password_hash(result[0][1],password):
-        # log in
-        print("right password")
+        flash("No user with this username has been found. Sign up?","log_in_exception")
+        return redirect("/")
+    
+    if not password:
+        flash("Invalid password","log_in_exception")
+    elif check_password_hash(result[0][1],password):
         #SESSION
         session["username"] = username
         session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
-        print("user id ", session["user_id"])
-
-        return redirect("/")
     else: 
-        print("Invalid password")
-        return render_template("index.html",valid_login=False)
+        flash("Invalid password","log_in_exception")
+    
+    return redirect("/")
     
 @app.route("/logout")
 def log_out():
     require_log_in()
     
     session.clear()
-    return render_template("index.html",valid_login=True)
+    return redirect("/")
 
 
 
@@ -125,16 +145,18 @@ def add_idea():
     idea = request.form["idea"]
     content = request.form["content"]
     type_of_skill = request.form["type_of_skill"]
-    print(f"type_of_skill {type_of_skill}", flush=True)
+    #print(f"type_of_skill {type_of_skill}", flush=True)
 
     if type_of_skill == "None":
         type_of_skill = ""
 
     clean_idea = idea.strip()
     clean_content = content.strip()
+    
     if len(clean_idea) > 100 or len(clean_idea) == 0:
         flash("The title cannot be empty or more than 100 char!", "new_idea")
         return redirect("/private_ideas")
+    
     elif len(clean_content) > 1000 or len(clean_content) == 0:
         flash("The content cannot be empty or more than 1000 char!", "new_idea")
         return redirect("/private_ideas")
@@ -157,9 +179,9 @@ def edit_idea(idea_id):
         new_content = request.form["edited_content"]
         new_title = request.form["edited_title"]
         type_of_skill= request.form["edited_type_of_skill"]
-        print("SCUEES")
         private_ideas.update_idea(int(idea_id),new_content, new_title, type_of_skill)
         return redirect("/private_ideas")
+    
     return "what is it then?? ERROR!"
 
 
@@ -188,7 +210,6 @@ def search_private_ideas():
         return redirect("/private_ideas")
     
     matches = private_ideas.find_matches(keyword)
-    print(matches)
     return render_template("private_ideas.html", ideas=matches)
 
 print(__name__)
@@ -201,38 +222,14 @@ def add_skill():
 
     skill = request.form["new_skill"]
     if len(skill.strip()) == 0 or len(skill.strip()) > 50:
-        return "Invalid skill input! The skill can't be empty or longer than 50 char."
+        flash("Invalid skill input! The skill can't be empty or longer than 50 char.","skills")
     passes = users.add_type_of_skill(session["user_id"], skill)
     if not passes:
         flash("The skill name is already taken!", "skills")
-    print("SKILL ", skill)
+
     return redirect("/private_ideas")
 
 
-
-#####
-### HOME (NAVIGATION) ####
-@app.route("/", methods = ["GET"])
-def show_home(user=None):
-    # Log in status is handled inside the html file
-
-    if "user_id" in session:
-        print("USER IDD", flush=True)
-        total_skills = users.get_total_skills(session["user_id"])
-        skill_stats = users.get_skill_stats(session["user_id"])
-        user = users.get_user(session["user_id"])
-        return render_template("index.html", user=user,total_skills=total_skills,skill_stats=skill_stats)
-    else:
-        return render_template("index.html", valid_login = True)
-
-
-def page_validity_helper(current_page, total_pages_count)-> int:
-        if current_page < 1:
-            return 1
-        elif current_page > total_pages_count:
-            return total_pages_count
-        else:
-            return current_page
 
 #### THREADS (PUBLIC) ####
 
@@ -256,7 +253,6 @@ def search_threads():
         return redirect("/threads")
         
     matches = forum.find_matches(keyword)
-    print(matches)
     return render_template("threads.html", threads=matches)
 
 
@@ -366,18 +362,20 @@ def show_user(user_id):
 def add_image():
     require_log_in()
     
-    file = request.files["image"]
+    file = request.files["image_input"]
     if not file.filename.endswith(".jpg"):
-        return "Wrong image type! (jpg images only)"
+        flash("Wrong image type! (jpg images only)", "image_exception")
+        return redirect("/")
 
     image = file.read()
     if len(image) > 100 * 1024:
-        return "The image it too big!"
+        flash("Submitted image is too big!", "image_exception")
+        return redirect("/")
 
     user_id = session["user_id"]
     users.update_image(user_id, image)
     user = users.get_user(user_id)
-    return show_home(user=user)
+    return redirect("/")
     
 
 @app.route("/image/<int:user_id>")

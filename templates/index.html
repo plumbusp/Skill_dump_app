@@ -32,11 +32,15 @@
     {% endif %}
 
     <form action="/add_image" method="post" enctype="multipart/form-data">
-      <p>
-        Add/change image: <input type="file" name="image" accept=".jpg" />
-      </p>
+      <label for="image_input"> Add/change image: </label><br>
+      <input type="file" name="image_input" accept=".jpg" />
       <input type="submit" value="Submit" />
     </form>
+    {% for message in get_flashed_messages(category_filter=["image_exception"]) %}
+            <p class = "exception_message">
+                {{ message }}
+            </p>
+    {% endfor %}
 
 
   {% else %}
@@ -46,9 +50,11 @@
       <input type="text" name="username"><br>
       <label>Password:</label><br>
       <input type="password" name="password"><br>
-      {% if not valid_login %}
-          <p>Invalid username or password! Try again</p>
-      {% endif %}
+      {% for message in get_flashed_messages(category_filter=["log_in_exception"]) %}
+            <p class = "exception_message">
+                {{ message }}
+            </p>
+      {% endfor %}
 
     <div class="content_island">
         <button>Log in</button> <br>
