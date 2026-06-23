@@ -10,12 +10,6 @@
     <h3>Here is your skills page. You can add your new skills here,
         and they will be visible only to you. </h3>
 
-        <form action="/search_private_ideas" method="GET" class ="content_island">
-            <label for = "keyword">Search your skills:</label><br>
-            <input type="text" name="keyword" maxlength="100"><br>
-            <button>Search</button> <br>
-        </form>
-
         <form action="/add_skill_type" method="POST" class="content_island">
             <label for="new_skill">Add new type of skill (reloads the page):</label><br>
             <input name = "new_skill" type="text" maxlength="50"><br>
@@ -50,11 +44,30 @@
             </p>
             {% endfor %}
         </form>
+        
+        <form action="/search_private_ideas" method="GET" class ="content_island">
+            <label for = "keyword">Search your skills:</label><br>
+            <input type="text" name="search_keyword" maxlength="100" {% if search_keyword %} value = {{search_keyword}} {% endif %}><br>
+  
+            <label for = "search_skill_type">Display your skills by type:</label><br>
+            <select name="search_skill_type">
+                <option value="All" {% if not search_skill_type %} selected {% endif %}>All</option>
+                <option value="None">None</option>
+                {% for skill in user_skill_types %}
+                    <option value="{{skill.names}}" 
+                    {% if search_skill_type == skill.names %}
+                         selected 
+                    {% endif %} > {{skill.names}}</option>
+                {% endfor %}
+            </select><br>
+
+            <button>Search</button> <br>
+        </form>
 
         <h3>Here are your skills:</h3>
         {% for idea in ideas %}
             <div class="content_island">
-                {% if idea.type_of_skill != "" %}
+                {% if idea.type_of_skill != "" or idea.type_of_skill != "None" %}
                     <p>Type of skill: <span class="accent_text">{{idea.type_of_skill}}</span></p>
                 {% endif %}
                 <p class = "title">{{idea["title"]}}</p>
@@ -68,9 +81,9 @@
             </div>
         {% endfor %}
         <p>
-            <a href= "/private_ideas/{{page-1}}">
-            &lt &lt</a> Page {{page}}/{{page_count}} 
-            <a href= "/private_ideas/{{page+1}}"> &gt &gt</a>
+            <a href="{{ url_for('show_private_ideas', page=page-1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&lt;&lt;</a>
+                Page {{page}}/{{page_count}}
+            <a href="{{ url_for('show_private_ideas', page=page+1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&gt;&gt;</a>
         </p>
     </p>
     {% else %}

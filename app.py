@@ -3,7 +3,7 @@ import sys
 import sqlite3
 import math
 from flask import Flask, session, abort, make_response
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, url_for
 from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
@@ -130,13 +130,23 @@ def log_out():
 @app.route("/private_ideas/<int:page>")
 def show_private_ideas(page=1):
     require_log_in()
+   
+    search_keyword = request.args.get("search_keyword") or None
+    if search_keyword and search_keyword.strip == "":
+        search_keyword = None
+        
+    search_skill_type = request.args.get("search_skill_type") or None
+    if search_skill_type and search_skill_type.strip().lower() == "all":
+        search_skill_type = None
 
-    ideas_count = private_ideas.ideas_count()
+    ideas_count = private_ideas.get_private_ideas_count(search_keyword, search_skill_type)
+    print("ideas count ", ideas_count)
     page_count = math.ceil(ideas_count/page_size)
     page = page_validity_helper(page, page_count)
 
+    ideas = private_ideas.get_private_ideas(page, page_size, search_keyword=search_keyword,search_skill_type=search_skill_type)
     user_skill_types = users.get_users_skills(session["user_id"])
-    return private_ideas.get_private_ideas(page, page_size, page_count, user_skill_types=user_skill_types)
+    return render_template("private_ideas.html", search_keyword=search_keyword,search_skill_type=search_skill_type, page=page, page_count=page_count, ideas=ideas,user_skill_types=user_skill_types)
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
@@ -146,9 +156,6 @@ def add_idea():
     content = request.form["content"]
     type_of_skill = request.form["type_of_skill"]
     #print(f"type_of_skill {type_of_skill}", flush=True)
-
-    if type_of_skill == "None":
-        type_of_skill = ""
 
     clean_idea = idea.strip()
     clean_content = content.strip()
@@ -203,16 +210,33 @@ def delete_idea(idea_id):
 
 @app.route("/search_private_ideas", methods =["GET"])
 def search_private_ideas():
+    # require_log_in()
+
+    # keyword =request.args.get("keyword")
+    # if not keyword:
+    #     return redirect("/private_ideas")
+    
+    # matches = private_ideas.find_matches(keyword)
     require_log_in()
 
-    keyword =request.args.get("keyword")
-    if not keyword:
-        return redirect("/private_ideas")
+    keyword = request.args.get("search_keyword") or None
+    skill_type = request.args.get("search_skill_type") or None
+    print("KEyword ", keyword)
+    print("Type of skill ", skill_type)
     
-    matches = private_ideas.find_matches(keyword)
-    return render_template("private_ideas.html", ideas=matches)
+    return redirect(url_for("show_private_ideas", search_keyword= keyword, search_skill_type=skill_type))
 
-print(__name__)
+
+# @app.route("/private_ideas_by_skill_type", methods = ["GET"])
+# def private_ideas_by_skill_type():
+#     require_log_in()
+
+#     skill_type = request.form["display_skill_type"]
+#     if skill_type == None:
+#         skill_type = ""
+#     matches = private_ideas.find_matches_by_skill_type(skill_type)
+#     return render_template("private_ideas.html", ideas=matches)
+
 
 
 #### SKILLS ####
