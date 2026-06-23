@@ -19,6 +19,7 @@
         <form action="/add_skill_type" method="POST" class="content_island">
             <label for="new_skill">Add new type of skill (reloads the page):</label><br>
             <input name = "new_skill" type="text" maxlength="50"><br>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button>Add</button> <br>
             {% for message in get_flashed_messages(category_filter=["skills"]) %}
             <p class = "exception_message">
@@ -42,7 +43,7 @@
 
             <label for = "content">What have you learned?:</label><br>
             <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
-
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button>Add a skill</button> <br>
             {% for message in get_flashed_messages(category_filter=["new_idea"]) %}
             <p class = "exception_message">
@@ -66,6 +67,7 @@
                     {% endif %} > {{skill.names}}</option>
                 {% endfor %}
             </select><br>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button>Search</button> <br>
                 {% for message in get_flashed_messages(category_filter=["private_ideas_search_exception"]) %}
                     <p class = "exception_message">

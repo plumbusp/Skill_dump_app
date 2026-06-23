@@ -2,6 +2,7 @@ import os
 import sys
 import sqlite3
 import math
+import secrets
 from flask import Flask, session, abort, make_response
 from flask import redirect, render_template, request, url_for
 from flask import flash
@@ -38,7 +39,14 @@ def require_log_in():
     if "user_id" not in session:
         abort(403)
 
-
+def check_csrf():
+    token = request.form.get("csrf_token")
+    if not token:
+        abort(403)
+        
+    if token != session["csrf_token"]:
+        abort(403)
+    
 #####
 ### HOME (NAVIGATION) ####
 @app.route("/", methods = ["GET"])
@@ -86,6 +94,7 @@ def sign_up():
     # succesfull sign up
     #SESSION
     session["username"] = username
+    session["csrf_token"] = secrets.token_hex(16)
     session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
 
     return redirect("/")
@@ -110,6 +119,7 @@ def log_in():
     elif check_password_hash(result[0][1],password):
         #SESSION
         session["username"] = username
+        session["csrf_token"] = secrets.token_hex(16)
         session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
     else: 
         flash("Invalid password","log_in_exception")
@@ -154,6 +164,7 @@ def show_private_ideas(page=1):
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
     require_log_in()
+    check_csrf()
 
     idea = request.form["idea"]
     content = request.form["content"]
@@ -186,6 +197,7 @@ def edit_idea(idea_id):
         return render_template("edit.html", for_idea=True, for_message=False, idea=idea, user_skill_types=user_skill_types)
 
     if request.method == "POST":
+        check_csrf()
         new_content = request.form["edited_content"]
         new_title = request.form["edited_title"]
         type_of_skill= request.form["edited_type_of_skill"]
@@ -205,6 +217,7 @@ def delete_idea(idea_id):
         return render_template("delete.html",for_idea=True, for_message=False, idea=idea)
 
     if request.method == "POST":
+        check_csrf()
         if "continue" in request.form:
             private_ideas.delete_idea(idea_id)
         return redirect("/private_ideas")
@@ -227,6 +240,7 @@ def search_private_ideas():
 @app.route("/add_skill_type", methods =["POST"])
 def add_skill():
     require_log_in()
+    check_csrf()
 
     skill = request.form["new_skill"]
     if len(skill.strip()) == 0 or len(skill.strip()) > 50:
@@ -277,6 +291,7 @@ def show_thread(thread_id:int):
 @app.route("/create_thread", methods=["POST"])
 def create_thread():
     require_log_in()
+    check_csrf()
 
     title = request.form["title_of_new_thread"]
     clean_title = title.strip()
@@ -296,6 +311,7 @@ def create_thread():
 @app.route("/new_message", methods = ["POST"])
 def add_message():
     require_log_in()
+    check_csrf()
     
     try:
         message = request.form["new_message"]
@@ -324,6 +340,7 @@ def edit_message(thread_id:int, message_id: int):
         return render_template("edit.html", for_idea = False, for_message = True, message=message, thread=thread)
 
     elif request.method == "POST":
+        check_csrf()
         new_contemt = request.form["content"]
         forum.update_message(thread_id, message_id, new_contemt)
         return redirect(f"/thread/{thread_id}")
@@ -343,6 +360,7 @@ def delete_message(thread_id:int, message_id: int):
         return render_template("delete.html", for_idea = False, for_message = True, message=message, thread_id =thread_id, message_id=message_id)
 
     elif request.method == "POST":
+        check_csrf()
         forum.delete_message(thread_id,message_id)
         return redirect(f"/thread/{thread_id}")
         
@@ -368,6 +386,7 @@ def show_user(user_id):
 @app.route("/add_image", methods=["POST"])
 def add_image():
     require_log_in()
+    check_csrf()
     
     file = request.files["image_input"]
     if not file.filename.endswith(".jpg"):

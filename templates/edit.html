@@ -22,7 +22,8 @@
         <input name="edited_title" value="{{ idea.title }}" /><br>
         <p>Content:</p>
         <textarea name="edited_content" rows="5" cols="40">{{ idea.content }}</textarea><br>
-        <input type="submit" value="Submit!" />
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input type="submit" value="Submit" />
     </form>
     
   {% elif for_message %}
@@ -31,6 +32,7 @@
         Message:<br />
         <textarea name="content" rows="5" cols="40">{{ message.content }}</textarea>
       </p>
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <input type="submit" value="Submit!" />
     </form>
   {% endif %}

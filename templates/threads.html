@@ -24,6 +24,7 @@
 
                 <label for= "initial_message"> Write a first message to the thread:</label><br>
                 <textarea rows="4" cols="40" name="initial_message" maxlength="500"></textarea><br>
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                 <button>Create thread</button>
             </div>
 

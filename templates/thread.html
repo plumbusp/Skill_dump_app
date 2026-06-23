@@ -9,9 +9,9 @@
 <body>
     {% if session.user_id %}
         <div class = "top_bar">
-        <a class = "top_bar_link" href="/">Home/Profile</a>
-        <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
-        <a class = "top_bar_link" href="/threads">Threads</a>
+            <a class = "top_bar_link" href="/">Home/Profile</a>
+            <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
+            <a class = "top_bar_link" href="/threads">Threads</a>
         </div>
 
         <h1> Thread: {{thread.title}}</h1>
@@ -19,6 +19,7 @@
         <form action="/new_message" method="post">
             <textarea rows="4" cols="40" name="new_message" maxlength="500"></textarea><br>
             <input type = "hidden" name="thread_id" value="{{thread.id}}" />
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button>Submit!</button>
         </form>
         <hr />
@@ -41,7 +42,7 @@
         <hr />
     {% else %}
         <p>You are not logged in! Please log in to see threads.</p>
-        <input type="button" value="Log in" action="/">
+        <a href="/" >Log in</a>
     {% endif %}
 </body>
 </html>

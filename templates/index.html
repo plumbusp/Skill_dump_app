@@ -41,6 +41,7 @@
     <form action="/add_image" method="post" enctype="multipart/form-data">
       <label for="image_input"> Add/change image: </label><br>
       <input type="file" name="image_input" accept=".jpg" />
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <input type="submit" value="Submit" />
     </form>
     {% for message in get_flashed_messages(category_filter=["image_exception"]) %}
@@ -62,10 +63,8 @@
                 {{ message }}
             </p>
       {% endfor %}
-
-    <div class="content_island">
-        <button>Log in</button> <br>
-      </form>
+      <button class="content_island">Log in</button> <br>
+    </form>
       <form action="/sign_up_page" method="GET">
         <button name= "SIGN_UP">Don't have an account? Sign up</button> <br>
       </form>
