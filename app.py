@@ -134,13 +134,16 @@ def show_private_ideas(page=1):
     search_keyword = request.args.get("search_keyword") or None
     if search_keyword and search_keyword.strip == "":
         search_keyword = None
-        
+
     search_skill_type = request.args.get("search_skill_type") or None
     if search_skill_type and search_skill_type.strip().lower() == "all":
         search_skill_type = None
 
     ideas_count = private_ideas.get_private_ideas_count(search_keyword, search_skill_type)
-    print("ideas count ", ideas_count)
+
+    if ideas_count == 0:
+        flash("There is no entries that satisfy given search parameters", "private_ideas_search_exception")
+        
     page_count = math.ceil(ideas_count/page_size)
     page = page_validity_helper(page, page_count)
 

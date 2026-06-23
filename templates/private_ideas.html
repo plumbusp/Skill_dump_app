@@ -60,8 +60,12 @@
                     {% endif %} > {{skill.names}}</option>
                 {% endfor %}
             </select><br>
-
             <button>Search</button> <br>
+                {% for message in get_flashed_messages(category_filter=["private_ideas_search_exception"]) %}
+                    <p class = "exception_message">
+                        {{ message }}   
+                    </p>
+                {% endfor %}
         </form>
 
         <h3>Here are your skills:</h3>
