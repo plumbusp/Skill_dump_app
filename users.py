@@ -9,23 +9,23 @@ import datetime
 short_list_length = 3
 
 def get_user(user_id):
-    sql = """SELECT id, usernames, image IS NOT NULL has_image
+    sql = """SELECT usernames, image IS NOT NULL has_image
         FROM log_in_info 
         WHERE id = ?"""
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
 def username_exists(username:str)-> bool:
-    sql = "SELECT usernames, passwords FROM log_in_info WHERE usernames=?"
+    sql = "SELECT usernames FROM log_in_info WHERE usernames=?"
     result = db.query(sql, [username])
     return bool(result)
 
 def get_username_password(username:str):
-    sql = "SELECT usernames, passwords FROM log_in_info WHERE usernames=?"
+    sql = "SELECT passwords FROM log_in_info WHERE usernames=?"
     result = db.query(sql, [username])
     if result== []:
         return ""
-    return result[0][1]
+    return result[0][0]
 
 def get_messages(user_id):
     sql = """SELECT m.id, m.thread_id, t.title thread_title,

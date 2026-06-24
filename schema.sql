@@ -15,8 +15,9 @@ CREATE TABLE IF NOT EXISTS ideas (
 
 CREATE TABLE IF NOT EXISTS skill_types (
     id INTEGER PRIMARY KEY,
-    names TEXT varchar(50) UNIQUE,
-    user_id INTEGER REFERENCES log_in_info(id)
+    names TEXT,
+    user_id INTEGER REFERENCES log_in_info(id),
+    UNIQUE (user_id, names)
 );
 
 CREATE TABLE IF NOT EXISTS threads (

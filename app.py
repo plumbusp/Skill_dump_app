@@ -4,6 +4,7 @@ import sqlite3
 import math
 import secrets
 import markupsafe
+from urllib.parse import urlparse
 from flask import Flask, session, abort, make_response
 from flask import redirect, render_template, request, url_for
 from flask import flash
@@ -61,16 +62,19 @@ def show_home():
     if "user_id" in session:
         total_skills = users.get_total_skills(session["user_id"])
         skill_stats = users.get_skill_stats(session["user_id"])
-        user = users.get_user(session["user_id"])
-        return render_template("index.html", user=user, total_skills=total_skills, skill_stats=skill_stats)
+        return render_template("index.html", total_skills=total_skills, skill_stats=skill_stats)
     else:
         filled = {}
         username = request.args.get("username")
+
         next_page = request.args.get("next_page")
-        if username:
-            filled["username"] = username
         if not next_page:
             next_page = request.referrer
+        if next_page and urlparse(next_page).path == "/sign_up_page":
+            next_page = "/"
+
+        if username:
+            filled["username"] = username
         return render_template("index.html", filled=filled, next_page=next_page)
 
 
@@ -126,7 +130,9 @@ def sign_up():
 def log_in():
     username = request.form.get("username") or "" # getting a name form the submitted form
     password = request.form.get("password")
+
     next_page = request.form.get("next_page") or "/"
+
     filled = {}
 
     if str(username).strip() == "":
@@ -203,7 +209,6 @@ def add_idea():
     idea = request.form["idea"]
     content = request.form["content"]
     type_of_skill = request.form["type_of_skill"]
-    #print(f"type_of_skill {type_of_skill}", flush=True)
 
     clean_idea = idea.strip()
     clean_content = content.strip()
