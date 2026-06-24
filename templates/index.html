@@ -63,6 +63,11 @@
       <input type="text" name="username" value = "{{filled.username}}"><br>
       <label>Password:</label><br>
       <input type="password" name="password"><br>
+      {% if next_page %}
+        <input type="hidden" name="next_page" value="{{next_page}}">
+      {% else %}
+        <input type="hidden" name="next_page" value="/">
+      {% endif %}
       {% for message in get_flashed_messages(category_filter=["log_in_exception"]) %}
             <p class = "exception_message">
                 {{ message }}

@@ -66,9 +66,12 @@ def show_home():
     else:
         filled = {}
         username = request.args.get("username")
+        next_page = request.args.get("next_page")
         if username:
             filled["username"] = username
-        return render_template("index.html", filled=filled)
+        if not next_page:
+            next_page = request.referrer
+        return render_template("index.html", filled=filled, next_page=next_page)
 
 
 def page_validity_helper(current_page, total_pages_count)-> int:
@@ -121,36 +124,41 @@ def sign_up():
 
 @app.route("/log_in", methods=["POST"])
 def log_in():
-    username = request.form.get("username") # getting a name form the submitted form
+    username = request.form.get("username") or "" # getting a name form the submitted form
     password = request.form.get("password")
+    next_page = request.form.get("next_page") or "/"
     filled = {}
 
     if str(username).strip() == "":
         flash("Username cannot be empty!", "log_in_exception")
-        return redirect("/")
-    elif str(password).strip() == "":
+        return redirect(url_for("show_home", next_page=next_page))
+    
+    filled["username"] = username
+    
+    if str(password).strip() == "":
         flash("Password cannot be empty!", "log_in_exception")
-        filled["username"] = username
-        return redirect(url_for("show_home", username=username))
-
-    result = db.query("SELECT usernames, passwords FROM log_in_info WHERE usernames=?", (username ,))
-    if result == []:
+        return redirect(url_for("show_home", username=username, next_page=next_page))
+    
+    elif not users.username_exists(username):
         flash("No user with this username has been found. Sign up?","log_in_exception")
         filled["username"] = username
-        return redirect(url_for("show_home", username=username))
+        return redirect(url_for("show_home", username=username, next_page=next_page))
     
-    if not password:
+    elif not password:
         flash("Invalid password", "log_in_exception")
-    elif check_password_hash(result[0][1], password):
+        return redirect(url_for("show_home", username=username, next_page=next_page))
+    
+    elif check_password_hash(users.get_username_password(username), password):
         #SESSION
         session["username"] = username
         session["csrf_token"] = secrets.token_hex(16)
         session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
+        return redirect(next_page)
+
     else: 
         flash("Invalid password","log_in_exception")
-
-    filled["username"] = username
-    return redirect(url_for("show_home", username=username))
+        return redirect(url_for("show_home", username=username, next_page=next_page))
+    
     
 @app.route("/logout")
 def log_out():
@@ -304,7 +312,7 @@ def search_threads():
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
     # Log in status is handled inside the html file
-    
+
     thread = forum.get_thread(thread_id)
     if not thread: # If user went to the thread that does not exist
         abort(403)

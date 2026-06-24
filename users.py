@@ -15,6 +15,18 @@ def get_user(user_id):
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
+def username_exists(username:str)-> bool:
+    sql = "SELECT usernames, passwords FROM log_in_info WHERE usernames=?"
+    result = db.query(sql, [username])
+    return bool(result)
+
+def get_username_password(username:str):
+    sql = "SELECT usernames, passwords FROM log_in_info WHERE usernames=?"
+    result = db.query(sql, [username])
+    if result== []:
+        return ""
+    return result[0][1]
+
 def get_messages(user_id):
     sql = """SELECT m.id, m.thread_id, t.title thread_title,
         m.sent_at, m.content
