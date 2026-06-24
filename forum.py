@@ -33,24 +33,14 @@ def add_thread(title, initial_message):
         VALUES (?,?)""", [title, user_id])
     thread_id = db.last_insert_id()
     g.lastthreadid = thread_id
-    add_message_to_thread(initial_message, thread_id)
+    add_message(initial_message, thread_id, user_id)
 
 def add_message(content, thread_id, user_id):
-    username = db.query_one("SELECT usernames FROM log_in_info WHERE id = ?", [user_id])["usernames"]
-    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id, username) VALUES (?, datetime('now'), ?, ?, ?)"
-    db.execute(sql, [content, user_id, thread_id, username])
-
-# def get_name(thread_id:int):
-#     result = db.query_one("""SELECT title FROM threads WHERE id = ? """, [thread_id])
-#     return result["title"]
+    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id) VALUES (?, datetime('now'), ?, ?)"
+    db.execute(sql, [content, user_id, thread_id])
 
 def get_last_thread_id():
     return g.lastthreadid
-
-def add_message_to_thread(content, thread_id):
-    sql = """INSERT INTO messages (content, sent_at, user_id, username, thread_id)
-        VALUES (?, datetime('now'), ?, ?, ?)"""
-    db.execute(sql, [content, session["user_id"], session["username"], thread_id])
 
 def get_messages(thread_id):
     sql = """SELECT m.id, m.content, m.sent_at, m.user_id, log_in_info.usernames AS username
@@ -61,8 +51,10 @@ def get_messages(thread_id):
     return db.query(sql, [thread_id])
 
 def get_message(thread_id:int, message_id:int):
-    sql = """SELECT m.id, m.content, m.user_id FROM messages AS m
-        WHERE thread_id = ? AND id = ?"""
+    sql = """SELECT m.id, m.content, m.user_id, log_in_info.usernames AS username
+        FROM messages AS m
+        JOIN log_in_info ON m.user_id = log_in_info.id
+        WHERE m.thread_id = ? AND m.id = ?"""
     return db.query_one(sql, [thread_id, message_id])
 
 def update_message(thread_id:int, message_id:int, content:str):

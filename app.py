@@ -365,7 +365,7 @@ def edit_message(thread_id:int, message_id: int):
     thread = forum.get_thread(thread_id)
     message = forum.get_message(thread_id, message_id)
 
-    if message["user_id"] != session["user_id"]:
+    if not message or message["user_id"] != session["user_id"]:
         abort(403) # Forbidden access
 
     if request.method == "GET":
