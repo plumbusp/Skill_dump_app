@@ -1,20 +1,19 @@
 # Skill dump 
-Learn somethings new eveyday, but forget with time? That application is the solution
+Do you learn somethings new eveyday, but forget what have you learned with time? That application is the solution
 
 ## Features:
-- Log in, Sing in
-- Create, modify and delete simple idea entries
-- Search by keyword (browser)
-- Browse your ideas
-  
-## Upcoming features:
+- Log in, Sing in.
+- Create, modify and delete (private) **skill entries**. Choose skill type for each skill.
+- Search skills by keyword or by skill type (in private skills).
+- Browse your skills and see your **skill stats** on the home page.
+- Add a **profile picture**. It wil be visible for all users.
+- Browse threads even without login (**easy redirection** after the login, back to the thread you have been browsing. Not that there is no easy redirection awailable on the sign in or when the user was switching tabs between log in and sign in).
+- Create your own **threads** and send messages to others' threads.
+- Check other user's profiles and see their profile picture and last thread sent messages.
 
-- They can add label entries in a certain category when creating them.
-- Users can view their skill history and track which areas they have developed the most. The application offers private skill storage for each user and a public dashboard displaying ideas on which skills are important and why. Users can view their own private entries and the public entries of others.
-- Users can search for their own skills using labels assigned at creation. They can also search for skills on the public dashboard.
-- Users can see statistics on how often a new skill is acquired and which labels appear more often.
-- Users can assign one or more labels to a skill. Available labels are stored in the database.
-- Users can add comments to their own skills, as well as to others' skills on the public dashboard.
+## Technical notes on the app:
+- The developer tried their best to consider security risks, for example SQL or XSS injections. CSRF token against CSRF attacks is implemented. 'next_page' logic contains a certain security risk, as a attacker can put a url to the differnt site, however this issue seems to be out of the scope of the course.
+- private_ideas.py serves as a module for dealing with all private skills related matters.
 
 ## How to test:
 - Install python and flask. If flask is not installed: pip install flask
