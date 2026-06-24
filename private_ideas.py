@@ -62,8 +62,11 @@ def get_private_ideas_count(search_keyword=None, search_skill_type=None)-> int:
 def add_private_idea(idea: str, content:str, type_of_skill:str):
     db.execute("INSERT INTO ideas (title, content, user_id, type_of_skill) VALUES (?,?,?,?)",[idea, content, session["user_id"], type_of_skill])
 
-def get_idea(idea_id)-> dict:
-    return db.query("SELECT i.id, i.title, i.content, i.type_of_skill FROM ideas AS i WHERE id = ?", [idea_id])[0]
+def get_idea(idea_id, user_id):
+    result = db.query_one("SELECT i.id, i.title, i.content, i.type_of_skill FROM ideas AS i WHERE id = ? AND user_id = ?", [idea_id, user_id])
+    if result == []:
+        return None
+    return result
 
 def update_idea(idea_id:int, content:str, title:str, type_of_skill:str):
     db.execute("UPDATE ideas SET title = ?, content = ?, type_of_skill = ? WHERE id = ?", [title, content, type_of_skill, idea_id])

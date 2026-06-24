@@ -229,7 +229,10 @@ def add_idea():
 def edit_idea(idea_id):
     require_log_in()
 
-    idea = private_ideas.get_idea(idea_id)
+    idea = private_ideas.get_idea(idea_id, session["user_id"])
+    if not idea:
+        abort(403)
+
     user_skill_types = users.get_users_skills(session["user_id"])
 
     if request.method == "GET":
@@ -250,7 +253,9 @@ def edit_idea(idea_id):
 def delete_idea(idea_id):
     require_log_in()
 
-    idea = private_ideas.get_idea(idea_id)
+    idea = private_ideas.get_idea(idea_id, session["user_id"])
+    if not idea:
+        abort(403)
 
     if request.method == "GET":
         return render_template("delete.html", for_idea=True, for_message=False, idea=idea)
