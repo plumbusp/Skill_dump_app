@@ -303,8 +303,8 @@ def search_threads():
 
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id:int):
-    require_log_in()
-
+    # Log in status is handled inside the html file
+    
     thread = forum.get_thread(thread_id)
     if not thread: # If user went to the thread that does not exist
         abort(403)

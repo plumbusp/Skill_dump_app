@@ -13,9 +13,10 @@
             <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
             <a class = "top_bar_link" href="/threads">Threads</a>
         </div>
+    {% endif %}
         
         <h1> Threads </h1>
-
+    {% if session.username %}
         <form action="/create_thread" method="post"> 
             <h4>Create a new thread:</h4>
             <div class="content_island">
@@ -27,8 +28,10 @@
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                 <button>Create thread</button>
             </div>
-
         </form>
+    {% else %}
+        <p>You are not logged in! Please <a href="/">log in</a> to create a thread.</p>
+    {% endif %}
         
         <form action="/search_threads" method="GET">
             <div class="content_island">
@@ -47,9 +50,5 @@
             &lt &lt</a> Page {{page}}/{{page_count}} 
             <a href= "/threads/{{page+1}}"> &gt &gt</a>
         </p>
-    {% else %}
-        <p>You are not logged in! Please log in to see threads.</p>
-        <a href="/" >Log in</a>
-    {% endif %}
 </body>
 </html>

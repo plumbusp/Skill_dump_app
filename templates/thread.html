@@ -13,8 +13,11 @@
             <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
             <a class = "top_bar_link" href="/threads">Threads</a>
         </div>
+    {% endif %}
 
         <h1> Thread: {{thread.title}}</h1>
+
+    {% if session.username %}
         <p> Add a new message: </p>
         <form action="/new_message" method="post">
             <textarea rows="4" cols="40" name="new_message" maxlength="500"></textarea><br>
@@ -23,26 +26,24 @@
             <button>Submit!</button>
         </form>
         <hr />
-
-        {% for message in messages %}
-            <div class="content_island">
-                <a href="/user/{{message.user_id}}">{{message.username}}</a>
-                <div class="content_island">
-                    <p>({{ message.sent_at }}):</p>
-                    <p>
-                        {{ message.content | show_lines}}
-                    </p>
-                    {% if message.user_id == session.user_id %}
-                        <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
-                        <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
-        <hr />
     {% else %}
-        <p>You are not logged in! Please log in to see threads.</p>
-        <a href="/" >Log in</a>
+        <p>You are not logged in! Please <a href="/">log in</a> to send a message to the thread.</p>
+
     {% endif %}
+    {% for message in messages %}
+        <div class="content_island">
+            <a href="/user/{{message.user_id}}">{{message.username}}</a>
+            <div class="content_island">
+                <p>({{ message.sent_at }}):</p>
+                <p>
+                    {{ message.content | show_lines}}
+                </p>
+                {% if session.username and message.user_id == session.user_id %}
+                    <a href="/edit_message/{{thread.id}}/{{message.id}}">Edit message</a>
+                    <a href="/delete_message/{{thread.id}}/{{message.id}}">Delete message</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
 </body>
 </html>
