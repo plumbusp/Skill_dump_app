@@ -21,7 +21,7 @@ Do you learn something new every day, but forget what you have learned with time
 - Activate virtual environment:
   - for bash: `python3 -m venv venv`,then `source venv/bin/activate`
   - for powershelll: `python -m venv venv`,then `venv\Scripts\Activate.ps1`
-- Install Python and Flask. If Flask is not installed: `pip install flask`
+- Install Flask: `pip install flask`
 - Set up the environmental variable SECRET_KEY. Use this command (PowerShell):
 ```
 $env:SECRET_KEY = (python -c "import secrets; print(secrets.token_hex(8))")
