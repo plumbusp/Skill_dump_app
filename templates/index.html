@@ -34,7 +34,7 @@
     </div>
     <hr>
     <h4>Profile picture:</h4>
-    {% if user and user.has_image %}
+    {% if has_image %}
       <img src="/image/{{ user.id }}" />
     {% endif %}
 

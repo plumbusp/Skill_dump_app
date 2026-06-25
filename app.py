@@ -61,7 +61,12 @@ def show_home():
     if "user_id" in session:
         total_skills = users.get_total_skills(session["user_id"])
         skill_stats = users.get_skill_stats(session["user_id"])
-        return render_template("index.html", total_skills=total_skills, skill_stats=skill_stats)
+        user_image = users.get_image(session["user_id"])
+        if not user_image:
+            return render_template("index.html", total_skills=total_skills, skill_stats=skill_stats)
+        else:
+            return render_template("index.html", total_skills=total_skills, skill_stats=skill_stats,user_image =user_image)
+    
     else:
         filled = {}
         username = request.args.get("username")
