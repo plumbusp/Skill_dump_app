@@ -18,7 +18,9 @@ Do you learn something new every day, but forget what you have learned with time
 
 ## How to test:
 - Clone this repository to the machine using `git clone https://github.com/plumbusp/Skill_dump_app.git`
-- Activate virtual environment: `python3 -m venv venv`,then `source venv/bin/activate`
+- Activate virtual environment:
+  - for bash: `python3 -m venv venv`,then `source venv/bin/activate`
+  - for powershelll: `python -m venv venv`,then `venv\Scripts\Activate.ps1`
 - Install Python and Flask. If Flask is not installed: `pip install flask`
 - Set up the environmental variable SECRET_KEY. Use this command (PowerShell):
 ```
