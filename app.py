@@ -348,10 +348,9 @@ def create_thread():
     if len(clean_message) == 0 or len(clean_message) > 500:
         abort(403)
 
-    forum.add_thread(title, initial_message)
+    last_thread_id = forum.add_thread(title, initial_message)
 
-    thread_id = forum.get_last_thread_id()
-    return redirect(f"/thread/{thread_id}")
+    return redirect(f"/thread/{last_thread_id}")
 
 @app.route("/new_message", methods = ["POST"])
 def add_message():

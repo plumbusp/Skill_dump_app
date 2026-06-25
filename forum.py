@@ -23,20 +23,19 @@ def get_thread(thread_id):
     result = db.query_one(sql, [thread_id])
     return result if result else None
 
-def add_thread(title, initial_message):
+def add_thread(title, initial_message) -> int:
     user_id = session["user_id"]
     db.execute("""INSERT INTO threads (title, user_id)
         VALUES (?,?)""", [title, user_id])
     thread_id = db.last_insert_id()
-    g.lastthreadid = thread_id
     add_message(initial_message, thread_id, user_id)
+    return thread_id
+
 
 def add_message(content, thread_id, user_id):
     sql = "INSERT INTO messages (content, sent_at, user_id, thread_id) VALUES (?, datetime('now'), ?, ?)"
     db.execute(sql, [content, user_id, thread_id])
 
-def get_last_thread_id():
-    return g.lastthreadid
 
 def get_messages(thread_id):
     sql = """SELECT m.id, m.content, m.sent_at, m.user_id, log_in_info.usernames AS username
