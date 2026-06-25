@@ -1,10 +1,9 @@
-import os
-import sys
 import sqlite3
 import math
 import secrets
 import markupsafe
 import time
+import config
 from urllib.parse import urlparse
 from flask import Flask, session, abort, make_response, g
 from flask import redirect, render_template, request, url_for
@@ -18,18 +17,7 @@ app = Flask(__name__)
 ### creating all tables in databse:
 db.create_app_tables()
 
-if not (SECRET_KEY := os.environ.get("SECRET_KEY")):
-    con_par = ConfigParser()
-    con_par.read("config.cfg")
-    file = con_par["secret-key"]["secret_key"]
-    if not file:
-        #print("Secret Key is not set!", flush=True)
-        sys.exit(1)
-    initialized = False
-    app.secret_key = file
-else:
-    initialized = False
-    app.secret_key = SECRET_KEY 
+app.secret_key = config.secret_key
 
 page_size = 10
 
