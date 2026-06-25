@@ -35,7 +35,7 @@
     <hr>
     <h4>Profile picture:</h4>
     {% if has_image %}
-      <img src="/image/{{ user.id }}" />
+      <img src="/image/{{ session.user_id }}" />
     {% endif %}
 
     <form action="/add_image" method="post" enctype="multipart/form-data">
