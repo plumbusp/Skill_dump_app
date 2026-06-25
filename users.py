@@ -1,10 +1,5 @@
 import sqlite3
-from flask import session
-from flask import redirect, render_template, request, g
-from werkzeug.security import generate_password_hash, check_password_hash
-import config
 import db
-import datetime
 
 short_list_length = 3
 

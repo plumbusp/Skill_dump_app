@@ -1,11 +1,7 @@
 """Public ideas or forum"""
-import sqlite3
 from flask import session
-from flask import redirect, render_template, request, g
-from werkzeug.security import generate_password_hash, check_password_hash
-import config
 import db
-import datetime
+
 
 def get_threads(page, page_size):
     sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last

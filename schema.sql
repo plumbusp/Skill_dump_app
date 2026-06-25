@@ -33,3 +33,5 @@ CREATE TABLE IF NOT EXISTS messages (
     user_id INTEGER REFERENCES log_in_info(id),
     thread_id INTEGER REFERENCES threads(id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_thread_messages ON messages (thread_id);

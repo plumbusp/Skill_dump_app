@@ -4,15 +4,14 @@ import sqlite3
 import math
 import secrets
 import markupsafe
+import time
 from urllib.parse import urlparse
-from flask import Flask, session, abort, make_response
+from flask import Flask, session, abort, make_response, g
 from flask import redirect, render_template, request, url_for
 from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash
-import config
 import db
 import private_ideas, forum, users
-from werkzeug.datastructures import FileStorage
 from configparser import ConfigParser # for local testing only
 
 app = Flask(__name__)
@@ -32,8 +31,20 @@ else:
     initialized = False
     app.secret_key = SECRET_KEY 
 
+page_size = 10
 
-page_size = 2
+#### TIME MEASUREMENT ####
+@app.before_request
+def start_timer():
+    g.start_time = time.time()
+
+@app.after_request
+def stop_timer(response):
+    stop_time = time.time()
+    if g.start_time:
+        total_time = stop_time - g.start_time
+        print("Total time for the view function to run ", str(total_time) + " s", flush=True)
+    return response
 
 #### HELPER/ GENERAL METHODS ####
 def require_log_in():
