@@ -17,7 +17,7 @@ app = Flask(__name__)
 ### creating all tables in databse:
 db.create_app_tables()
 
-app.secret_key = config.secret_key
+app.secret_key = config.initialize_secret_key()
 
 page_size = 10
 
@@ -67,7 +67,6 @@ def show_home():
     else:
         filled = {}
         username = request.args.get("username")
-
         next_page = request.args.get("next_page")
         if not next_page:
             next_page = request.referrer
@@ -131,7 +130,6 @@ def sign_up():
 def log_in():
     username = request.form.get("username") or "" # getting a name form the submitted form
     password = request.form.get("password")
-
     next_page = request.form.get("next_page") or "/"
 
     filled = {}

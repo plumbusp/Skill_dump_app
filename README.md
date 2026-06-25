@@ -22,4 +22,12 @@ Do you learn something new every day, but forget what you have learned with time
   - for bash: `python3 -m venv venv`,then `source venv/bin/activate`
   - for powershelll: `python -m venv venv`,then `venv\Scripts\Activate.ps1`
 - Install Flask: `pip install flask`
+- Set up the environmental variable SECRET_KEY. Use this command (PowerShell):
+```
+$env:SECRET_KEY = (python -c "import secrets; print(secrets.token_hex(8))")
+```
+(or bash)
+```
+export SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(8))")
+```
 - Run the application using the `flask run` command and go to http://127.0.0.1:5000
