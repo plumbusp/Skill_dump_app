@@ -240,6 +240,7 @@ def add_idea():
 def edit_idea(idea_id):
     require_log_in()
 
+    # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
@@ -264,6 +265,7 @@ def edit_idea(idea_id):
 def delete_idea(idea_id):
     require_log_in()
 
+    # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
