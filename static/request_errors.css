@@ -1,9 +1,0 @@
-@font-face {font-family: StudyDaily; src: url('Study-Daily.otf');}
-
-text{
-    font-family: StudyDaily
-}
-h1{
-    color: rgb(255,133,89);
-    font-style: italic;
-}
