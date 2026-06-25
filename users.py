@@ -3,11 +3,11 @@ import db
 
 short_list_length = 3
 
-def get_user(user_id):
-    sql = """SELECT usernames, image IS NOT NULL has_image
+def get_username(user_id):
+    sql = """SELECT usernames
         FROM log_in_info 
         WHERE id = ?"""
-    result = db.query(sql, [user_id])
+    result = db.query_one(sql, [user_id])
     return result[0] if result else None
 
 def username_exists(username:str)-> bool:

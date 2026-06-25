@@ -419,11 +419,16 @@ def show_user(user_id):
     if user_id == session["user_id"]:
         return redirect("/")
     
-    user = users.get_user(user_id)
+    user_image = users.get_image(user_id)
+    user = {}
+    user["user_id"] = user_id
+    user["username"] = users.get_username(user_id)
+
     if not user:
         abort(404)
     last_messages = users.get_last_messages(user_id)
-    return render_template("user.html", user=user, last_messages=last_messages)
+
+    return render_template("user.html", user=user, last_messages=last_messages, has_image=bool(user_image))
 
 ### USER IMAGES ###
 @app.route("/add_image", methods=["POST"])

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profile of {user.usernames}:</title>
+  <title>Profile of {user.username}:</title>
   <link rel="stylesheet" href="/static/main.css">
 </head>
 
 <body>
-    <h1>Profile of {{user.usernames}}:</h1>
-    {% if user.has_image %}
-      <img src="/image/{{ user.id }}" />
+    <h1>Profile of {{user.username}}:</h1>
+    {% if has_image %}
+      <img src="/image/{{ user.user_id }}" />
     {% endif %}
     <h2> Last sent public ideas: </h2>
     {% for message in last_messages %}
