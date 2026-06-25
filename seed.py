@@ -7,9 +7,9 @@ db.execute("DELETE FROM log_in_info")
 db.execute("DELETE FROM threads")
 db.execute("DELETE FROM messages")
 
-user_count = 1000
-thread_count = 10**5
-message_count = 10**6
+user_count =1000
+thread_count = 10**6
+message_count = 10**7
 
 for i in range(1, user_count + 1):
     db.execute("INSERT INTO log_in_info (usernames) VALUES (?)",
