@@ -14,6 +14,7 @@ Do you learn somethings new eveyday, but forget what have you learned with time?
 ## Technical notes on the app:
 - The developer tried their best to consider security risks, for example SQL or XSS injections. CSRF token against CSRF attacks is implemented. 'next_page' logic contains a certain security risk, as a attacker can put a url to the differnt site, however this issue seems to be out of the scope of the course.
 - private_ideas.py serves as a module for dealing with all private skills related matters.
+- App supports big amount of data in threads, without lagging. Report is made and is in big_data_amount_report.md
 
 ## How to test:
 - Install python and flask. If flask is not installed: pip install flask
