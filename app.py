@@ -14,6 +14,7 @@ import private_ideas, forum, users
 from configparser import ConfigParser # for local testing only
 
 app = Flask(__name__)
+
 ### creating all tables in databse:
 db.create_app_tables()
 
@@ -21,7 +22,7 @@ app.secret_key = config.initialize_secret_key()
 
 page_size = 10
 
-#### TIME MEASUREMENT ####
+#### TIME MEASUREMENTS ####
 @app.before_request
 def start_timer():
     g.start_time = time.time()
@@ -53,31 +54,6 @@ def show_lines(content):
     content = content.replace("\n", "<br />")
     return markupsafe.Markup(content)
 
-#####
-### HOME (NAVIGATION) ####
-@app.route("/", methods = ["GET"])
-def show_home():
-    # Log in status is handled inside the html file
-    if "user_id" in session:
-        total_skills = users.get_total_skills(session["user_id"])
-        skill_stats = users.get_skill_stats(session["user_id"])
-        user_image = users.get_image(session["user_id"])
-        return render_template("index.html", total_skills=total_skills, skill_stats=skill_stats, has_image=bool(user_image))
-    
-    else:
-        filled = {}
-        username = request.args.get("username")
-        next_page = request.args.get("next_page")
-        if not next_page:
-            next_page = request.referrer
-        if next_page and urlparse(next_page).path == "/sign_up_page":
-            next_page = "/"
-
-        if username:
-            filled["username"] = username
-        return render_template("index.html", filled=filled, next_page=next_page)
-
-
 def page_validity_helper(current_page, total_pages_count)-> int:
         if current_page < 1:
             return 1
@@ -85,6 +61,41 @@ def page_validity_helper(current_page, total_pages_count)-> int:
             return total_pages_count
         else:
             return current_page
+        
+
+#### METHODS FOR CLEANER CODE ####
+'''Method returns a dictionary with keys "total_skills", "skill_stats" and "user_image" '''
+def get_user_info_for_home(user_id: int)-> dict:
+    stats = {}
+    stats["total_skills"] = users.get_total_skills(session["user_id"])
+    stats["skill_stats"] = users.get_skill_stats(session["user_id"])
+    stats["has_image"] = bool(users.get_image(session["user_id"]))
+    return stats
+
+
+#####
+### HOME (NAVIGATION) ####
+@app.route("/", methods = ["GET"])
+def show_home():
+    # Log in status is handled inside the html file
+    if "user_id" in session:
+        stats = get_user_info_for_home(session["user_id"])
+        return render_template("index.html", stats=stats)
+    
+    else:
+        filled = {}
+
+        next_page = request.args.get("next_page")
+        if not next_page:
+            next_page = request.referrer
+        if next_page and urlparse(next_page).path == "/sign_up_page":
+            next_page = "/"
+        
+        username = request.args.get("username")
+        if username:
+            filled["username"] = username
+        return render_template("index.html", filled=filled, next_page=next_page)
+
 
 ### SIGNING IN/ LOGGING IN ####
 @app.route("/sign_up_page")
