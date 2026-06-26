@@ -31,9 +31,10 @@ def get_private_ideas(page, page_size, search_keyword=None, search_skill_type=No
     else:
         sql = """SELECT i.title, i.content, i.type_of_skill, i.id
             FROM ideas i
-            WHERE i.user_id = ? AND title LIKE ?
+            WHERE i.user_id = ? AND (i.title LIKE ? OR i.content LIKE ?)
             ORDER BY i.id DESC
             LIMIT ? OFFSET ?"""
+        params.append(f"%{search_keyword}%")
         params.append(f"%{search_keyword}%")
     params.extend([limit, offset])
 
