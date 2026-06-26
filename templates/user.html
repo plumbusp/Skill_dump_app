@@ -6,6 +6,13 @@
 </head>
 
 <body>
+    {% if session.username %}
+        <div class = "top_bar">
+            <a class = "top_bar_link" href="/">Home/Profile</a>
+            <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
+            <a class = "top_bar_link" href="/threads">Threads</a>
+        </div>
+    {% endif %}
     <h1>Profile of {{user.username}}:</h1>
     {% if has_image %}
       <img src="/image/{{ user.user_id }}" />

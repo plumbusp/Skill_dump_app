@@ -229,6 +229,9 @@ def edit_idea(idea_id):
     require_log_in()
 
     # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
+    #  private_ideas.get_idea handles cases when the idea 
+    #       doens't belong to the current user, by returning None as a
+    #       query result.
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
@@ -254,6 +257,9 @@ def delete_idea(idea_id):
     require_log_in()
 
     # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
+    #  private_ideas.get_idea handles cases when the idea 
+    #       doens't belong to the current user, by returning None as a
+    #       query result. 
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
