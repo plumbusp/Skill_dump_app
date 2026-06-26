@@ -37,6 +37,11 @@
             <div class="content_island">
                 <label for = "search">Search threads:</label><br>
                 <input type="text" name="keyword" maxlength="100"><br>
+                {% for message in get_flashed_messages(category_filter=["thread_search_exception"]) %}
+                    <p class = "exception_message">
+                        {{ message }}
+                    </p>
+                {% endfor %}
                 <button>Search</button> <br>
             </div>
         </form>

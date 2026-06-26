@@ -23,6 +23,11 @@
             <textarea rows="4" cols="40" name="new_message" maxlength="500"></textarea><br>
             <input type = "hidden" name="thread_id" value="{{thread.id}}" />
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            {% for message in get_flashed_messages(category_filter=["new_message_exception"]) %}
+                <p class = "exception_message">
+                    {{ message }}
+                </p>
+            {% endfor %}
             <button>Submit!</button>
         </form>
         <hr />

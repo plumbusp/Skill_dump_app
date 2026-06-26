@@ -345,13 +345,15 @@ def create_thread():
     title = request.form["title_of_new_thread"]
     clean_title = title.strip()
     if len(clean_title) == 0 or len(clean_title) > 100:
-        abort(403) 
-
+        flash("The title cannot be empty or more than 100 char!", "thread_search_exception")
+        return redirect("/threads")
+    
     initial_message = request.form["initial_message"]
     clean_message = initial_message.strip()
     if len(clean_message) == 0 or len(clean_message) > 500:
-        abort(403)
-
+        flash("A message cannot be empty or more than 500 char!", "thread_search_exception")
+        return redirect("/threads")
+    
     last_thread_id = forum.add_thread(title, initial_message)
 
     return redirect(f"/thread/{last_thread_id}")
@@ -363,11 +365,19 @@ def add_message():
     
     try:
         message = request.form["new_message"]
-        clean_message = message.strip()
-        if len(clean_message) == 0 or len(clean_message) > 500:
-            abort(403)
-
         thread_id = request.form["thread_id"]
+
+        try:
+            thread_id = int(thread_id) 
+        except: # if it fails, it means that malicious path was added to the hidden input
+            abort(404)
+
+        clean_message = message.strip()
+
+        if len(clean_message) == 0 or len(clean_message) > 500:
+            flash("A message cannot be empty or more than 500 char!", "new_message_exception")
+            return redirect(f"/thread/{thread_id}")
+
         forum.add_message(message, thread_id, session["user_id"])
         return redirect(f"/thread/{thread_id}")
     except: # catches internal server error, if e.g. a user changed thread_id in page inspection to the unexisting one
