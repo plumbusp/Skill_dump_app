@@ -43,7 +43,8 @@
     <hr>
     <h4>Profile picture:</h4>
     {% if stats.get("has_image") %}
-      <img src="/image/{{ session.user_id }}" />
+      <img src="/image/{{ session.user_id }}" alt="The profile picture of the logged-in account user with the username {{ session.username }}. 
+        This picture is visible to other users of the app."/>
     {% endif %}
 
     <form action="/add_image" method="post" enctype="multipart/form-data">

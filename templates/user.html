@@ -15,7 +15,7 @@
     {% endif %}
     <h1>Profile of {{user.username}}:</h1>
     {% if has_image %}
-      <img src="/image/{{ user.user_id }}" />
+      <img src="/image/{{ user.user_id }}" alt="Profile picture of the user with the username {{user.username}}"/>
     {% endif %}
     <h2> Last sent public ideas: </h2>
     {% for message in last_messages %}
