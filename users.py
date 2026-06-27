@@ -1,7 +1,8 @@
+# pylint: disable=C0116,C0115,C0114
 import sqlite3
 import db
 
-short_list_length = 3
+SHORT_LIST_LENGTH = 3
 
 def get_username(user_id):
     sql = """SELECT usernames
@@ -37,18 +38,17 @@ def get_last_messages(user_id):
         WHERE t.id = m.thread_id AND m.user_id = ?
         ORDER BY m.sent_at DESC"""
     last_messages = db.query(sql, [user_id])
-    if len(last_messages) < short_list_length:
+    if len(last_messages) < SHORT_LIST_LENGTH:
         return last_messages
-    else:
-        return last_messages[:3]
-    
+    return last_messages[:3]
+
 def get_image(user_id):
     sql = "SELECT image FROM log_in_info WHERE id = ?"
     result = db.query_one(sql, [user_id])
     if not result:
         return None
     return result["image"]
-    
+
 def update_image(user_id, image):
     sql = "UPDATE log_in_info SET image = ? WHERE id = ?"
     db.execute(sql, [image, user_id])
@@ -83,6 +83,8 @@ def get_skill_stats(user_id: int) -> list:
     one_percent = 100 / total_count if total_count else 0
 
     return [
-        f"{row['skill_type_name']} has {row['total']} appearances and is {one_percent * int(row['total']):.1f}% of all skills"
+        f"""{row['skill_type_name']} has {row['total']}
+            appearances and is {one_percent * int(row['total']):.1f}%
+            of all skills"""
         for row in result
     ]

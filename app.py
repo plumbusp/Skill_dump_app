@@ -1,17 +1,18 @@
+# pylint: disable=C0116,C0115,C0114
 import sqlite3
 import math
 import secrets
-import markupsafe
 import time
-import config
 from urllib.parse import urlparse
+import markupsafe
 from flask import Flask, session, abort, make_response, g
 from flask import redirect, render_template, request, url_for
 from flask import flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from configparser import ConfigParser # for local testing only
+import config
 import db
 import private_ideas, forum, users
-from configparser import ConfigParser # for local testing only
 
 app = Flask(__name__)
 
@@ -20,7 +21,7 @@ db.create_app_tables()
 
 app.secret_key = config.initialize_secret_key()
 
-page_size = 10
+PAGE_SIZE = 10
 
 #### TIME MEASUREMENTS ####
 @app.before_request
@@ -44,10 +45,10 @@ def check_csrf():
     token = request.form.get("csrf_token")
     if not token:
         abort(403)
-        
+
     if token != session["csrf_token"]:
         abort(403)
-    
+
 @app.template_filter()
 def show_lines(content):
     content = str(markupsafe.escape(content))
@@ -55,23 +56,21 @@ def show_lines(content):
     return markupsafe.Markup(content)
 
 def page_validity_helper(current_page, total_pages_count)-> int:
-        if current_page < 1:
-            return 1
-        elif current_page > total_pages_count:
-            return total_pages_count
-        else:
-            return current_page
-        
+    if current_page < 1:
+        return 1
+    elif current_page > total_pages_count:
+        return total_pages_count
+    else:
+        return current_page
 
 #### METHODS FOR CLEANER CODE ####
 '''Method returns a dictionary with keys "total_skills", "skill_stats" and "user_image" '''
 def get_user_info_for_home(user_id: int)-> dict:
     stats = {}
-    stats["total_skills"] = users.get_total_skills(session["user_id"])
-    stats["skill_stats"] = users.get_skill_stats(session["user_id"])
-    stats["has_image"] = bool(users.get_image(session["user_id"]))
+    stats["total_skills"] = users.get_total_skills(user_id)
+    stats["skill_stats"] = users.get_skill_stats(user_id)
+    stats["has_image"] = bool(users.get_image(user_id))
     return stats
-
 
 #####
 ### HOME (NAVIGATION) ####
@@ -81,20 +80,20 @@ def show_home():
     if "user_id" in session:
         stats = get_user_info_for_home(session["user_id"])
         return render_template("index.html", stats=stats)
-    
-    else:
-        filled = {}
 
-        next_page = request.args.get("next_page")
-        if not next_page:
-            next_page = request.referrer
-        if next_page and urlparse(next_page).path == "/sign_up_page":
-            next_page = "/"
-        
-        username = request.args.get("username")
-        if username:
-            filled["username"] = username
-        return render_template("index.html", filled=filled, next_page=next_page)
+    filled = {}
+
+    next_page = request.args.get("next_page")
+    if not next_page:
+        next_page = request.referrer
+    if next_page and urlparse(next_page).path == "/sign_up_page":
+        next_page = "/"
+
+    username = request.args.get("username")
+    if username:
+        filled["username"] = username
+
+    return render_template("index.html", filled=filled, next_page=next_page)
 
 
 ### SIGNING IN/ LOGGING IN ####
@@ -115,9 +114,10 @@ def sign_up():
     if password1 != password2:
         flash("Passwords don't match!", "sign_up_exception")
         return redirect(url_for("sign_up_page", username=username))
-    elif password1.strip() == "":
+    if password1.strip() == "":
         flash("A password cannot be empty!", "sign_up_exception")
         return redirect(url_for("sign_up_page", username=username))
+
     password_hash = generate_password_hash(password1)
 
     try:
@@ -132,14 +132,15 @@ def sign_up():
     #SESSION
     session["username"] = username
     session["csrf_token"] = secrets.token_hex(16)
-    session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
+    session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?",
+                                [username])[0]["id"]
 
     return redirect("/")
 
 
 @app.route("/log_in", methods=["POST"])
 def log_in():
-    username = request.form.get("username") or "" # getting a name form the submitted form
+    username = request.form.get("username") or ""# getting a name form the submitted form
     password = request.form.get("password")
     next_page = request.form.get("next_page") or "/"
 
@@ -148,38 +149,39 @@ def log_in():
     if str(username).strip() == "":
         flash("Username cannot be empty!", "log_in_exception")
         return redirect(url_for("show_home", next_page=next_page))
-    
+
     filled["username"] = username
-    
+
     if str(password).strip() == "":
         flash("Password cannot be empty!", "log_in_exception")
         return redirect(url_for("show_home", username=username, next_page=next_page))
-    
-    elif not users.username_exists(username):
+
+    if not users.username_exists(username):
         flash("No user with this username has been found. Sign up?","log_in_exception")
         filled["username"] = username
         return redirect(url_for("show_home", username=username, next_page=next_page))
-    
-    elif not password:
+
+    if not password:
         flash("Invalid password", "log_in_exception")
         return redirect(url_for("show_home", username=username, next_page=next_page))
-    
-    elif check_password_hash(users.get_username_password(username), password):
+
+    if check_password_hash(users.get_username_password(username), password):
         #SESSION
         session["username"] = username
         session["csrf_token"] = secrets.token_hex(16)
-        session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?", [username])[0]["id"]
+        session["user_id"] = db.query("SELECT id FROM log_in_info WHERE usernames = ?",
+                                    [username])[0]["id"]
         return redirect(next_page)
 
-    else: 
-        flash("Invalid password","log_in_exception")
-        return redirect(url_for("show_home", username=username, next_page=next_page))
-    
-    
+    flash("Invalid password","log_in_exception")
+    return redirect(url_for("show_home", username=username, next_page=next_page))
+
+
+
 @app.route("/logout")
 def log_out():
     require_log_in()
-    
+
     session.clear()
     return redirect("/")
 
@@ -190,7 +192,7 @@ def log_out():
 @app.route("/private_ideas/<int:page>")
 def show_private_ideas(page=1):
     require_log_in()
-   
+
     search_keyword = request.args.get("search_keyword") or None
     if search_keyword and search_keyword.strip == "":
         search_keyword = None
@@ -202,14 +204,20 @@ def show_private_ideas(page=1):
     ideas_count = private_ideas.get_private_ideas_count(search_keyword, search_skill_type)
 
     if ideas_count == 0:
-        flash("There is no entries that satisfy given search parameters", "private_ideas_search_exception")
+        flash("There is no entries that satisfy given search parameters",
+            "private_ideas_search_exception")
 
-    page_count = math.ceil(ideas_count/page_size)
+    page_count = math.ceil(ideas_count/PAGE_SIZE)
     page = page_validity_helper(page, page_count)
 
-    ideas = private_ideas.get_private_ideas(page, page_size, search_keyword=search_keyword, search_skill_type=search_skill_type)
+    ideas = private_ideas.get_private_ideas(page, PAGE_SIZE,
+                                        search_keyword=search_keyword,
+                                        search_skill_type=search_skill_type)
     user_skill_types = users.get_users_skills(session["user_id"])
-    return render_template("private_ideas.html", search_keyword=search_keyword, search_skill_type=search_skill_type, page=page, page_count=page_count, ideas=ideas, user_skill_types=user_skill_types)
+    return render_template("private_ideas.html",
+                        search_keyword=search_keyword, search_skill_type=search_skill_type,
+                        page=page, page_count=page_count, ideas=ideas,
+                        user_skill_types=user_skill_types)
 
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
@@ -222,12 +230,12 @@ def add_idea():
 
     clean_idea = idea.strip()
     clean_content = content.strip()
-    
+
     if len(clean_idea) > 100 or len(clean_idea) == 0:
         flash("The title cannot be empty or more than 100 char!", "new_idea")
         return redirect("/private_ideas")
-    
-    elif len(clean_content) > 1000 or len(clean_content) == 0:
+
+    if len(clean_content) > 1000 or len(clean_content) == 0:
         flash("The content cannot be empty or more than 1000 char!", "new_idea")
         return redirect("/private_ideas")
 
@@ -240,7 +248,7 @@ def edit_idea(idea_id):
     require_log_in()
 
     # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
-    #  private_ideas.get_idea handles cases when the idea 
+    # private_ideas.get_idea handles cases when the idea
     #       doens't belong to the current user, by returning None as a
     #       query result.
     idea = private_ideas.get_idea(idea_id, session["user_id"])
@@ -250,7 +258,9 @@ def edit_idea(idea_id):
     user_skill_types = users.get_users_skills(session["user_id"])
 
     if request.method == "GET":
-        return render_template("edit.html", for_idea=True, for_message=False, idea=idea, user_skill_types=user_skill_types)
+        return render_template("edit.html",
+                            for_idea=True, for_message=False,
+                            idea=idea, user_skill_types=user_skill_types)
 
     if request.method == "POST":
         check_csrf()
@@ -259,7 +269,7 @@ def edit_idea(idea_id):
         type_of_skill= request.form["edited_type_of_skill"]
         private_ideas.update_idea(int(idea_id), new_content, new_title, type_of_skill)
         return redirect("/private_ideas")
-    
+
     return "what is it then?? ERROR!"
 
 
@@ -268,22 +278,23 @@ def delete_idea(idea_id):
     require_log_in()
 
     # check if the user_id is correct for the idea_id is inside private_ideas.get_idea
-    #  private_ideas.get_idea handles cases when the idea 
+    #  private_ideas.get_idea handles cases when the idea
     #       doens't belong to the current user, by returning None as a
-    #       query result. 
+    #       query result.
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
 
     if request.method == "GET":
-        return render_template("delete.html", for_idea=True, for_message=False, idea=idea)
+        return render_template("delete.html",
+                            for_idea=True, for_message=False, idea=idea)
 
     if request.method == "POST":
         check_csrf()
         if "continue" in request.form:
             private_ideas.delete_idea(idea_id)
         return redirect("/private_ideas")
-    
+
     return "what is it then?? ERROR!"
 
 @app.route("/search_private_ideas", methods =["GET"])
@@ -292,8 +303,9 @@ def search_private_ideas():
 
     keyword = request.args.get("search_keyword") or None
     skill_type = request.args.get("search_skill_type") or None
-    
-    return redirect(url_for("show_private_ideas", search_keyword= keyword, search_skill_type=skill_type))
+
+    return redirect(url_for("show_private_ideas",
+                        search_keyword= keyword, search_skill_type=skill_type))
 
 
 #### SKILLS ####
@@ -320,10 +332,10 @@ def show_threads(page=1):
     # Log in status is handled inside the html file
     thread_count = forum.thread_count()
 
-    page_count = math.ceil(thread_count/page_size)
+    page_count = math.ceil(thread_count/PAGE_SIZE)
     page = page_validity_helper(page, page_count)
 
-    threads = forum.get_threads(page, page_size)
+    threads = forum.get_threads(page, PAGE_SIZE)
     return render_template("threads.html", threads=threads, page=page, page_count=page_count)
 
 @app.route("/search_threads", methods =["GET"])
@@ -332,7 +344,7 @@ def search_threads():
     keyword =request.args.get("keyword")
     if not keyword:
         return redirect("/threads")
-        
+
     matches = forum.find_matches(keyword)
     return render_template("threads.html", threads=matches)
 
@@ -358,13 +370,13 @@ def create_thread():
     if len(clean_title) == 0 or len(clean_title) > 100:
         flash("The title cannot be empty or more than 100 char!", "thread_search_exception")
         return redirect("/threads")
-    
+
     initial_message = request.form["initial_message"]
     clean_message = initial_message.strip()
     if len(clean_message) == 0 or len(clean_message) > 500:
         flash("A message cannot be empty or more than 500 char!", "thread_search_exception")
         return redirect("/threads")
-    
+
     last_thread_id = forum.add_thread(title, initial_message)
 
     return redirect(f"/thread/{last_thread_id}")
@@ -373,14 +385,14 @@ def create_thread():
 def add_message():
     require_log_in()
     check_csrf()
-    
+
     try:
         message = request.form["new_message"]
         thread_id = request.form["thread_id"]
 
         try:
-            thread_id = int(thread_id) 
-        except: # if it fails, it means that malicious path was added to the hidden input
+            thread_id = int(thread_id)
+        except ValueError: # if it fails, it means that malicious path was added to the hidden input
             abort(404)
 
         clean_message = message.strip()
@@ -391,7 +403,8 @@ def add_message():
 
         forum.add_message(message, thread_id, session["user_id"])
         return redirect(f"/thread/{thread_id}")
-    except: # catches internal server error, if e.g. a user changed thread_id in page inspection to the unexisting one
+    except: # catches internal server error,
+        # if e.g. a user changed thread_id in page inspection to the unexisting one
         abort(403)
 
 
@@ -406,14 +419,16 @@ def edit_message(thread_id:int, message_id: int):
         abort(403) # Forbidden access
 
     if request.method == "GET":
-        return render_template("edit.html", for_idea = False, for_message = True, message=message, thread=thread)
-
-    elif request.method == "POST":
+        return render_template("edit.html",
+                            for_idea = False, for_message = True,
+                            message=message, thread=thread)
+    
+    if request.method == "POST":
         check_csrf()
         new_contemt = request.form["content"]
         forum.update_message(thread_id, message_id, new_contemt)
         return redirect(f"/thread/{thread_id}")
-        
+
     return redirect(f"/thread/{thread_id}")
 
 @app.route("/delete_message/<int:thread_id>/<int:message_id>", methods=["GET", "POST"])
@@ -426,13 +441,15 @@ def delete_message(thread_id:int, message_id: int):
         abort(403) # Forbidden access
 
     if request.method == "GET":
-        return render_template("delete.html", for_idea = False, for_message = True, message=message, thread_id =thread_id, message_id=message_id)
+        return render_template("delete.html",
+                            for_idea = False, for_message = True,
+                            message=message, thread_id =thread_id, message_id=message_id)
 
-    elif request.method == "POST":
+    if request.method == "POST":
         check_csrf()
         forum.delete_message(thread_id,message_id)
         return redirect(f"/thread/{thread_id}")
-        
+
     return redirect(f"/thread/{thread_id}")
 
 
@@ -443,7 +460,7 @@ def show_user(user_id):
 
     if user_id == session["user_id"]:
         return redirect("/")
-    
+
     user_image = users.get_image(user_id)
     user = {}
     user["user_id"] = user_id
@@ -453,14 +470,16 @@ def show_user(user_id):
         abort(404)
     last_messages = users.get_last_messages(user_id)
 
-    return render_template("user.html", user=user, last_messages=last_messages, has_image=bool(user_image))
+    return render_template("user.html",
+                        user=user, last_messages=last_messages,
+                        has_image=bool(user_image))
 
 ### USER IMAGES ###
 @app.route("/add_image", methods=["POST"])
 def add_image():
     require_log_in()
     check_csrf()
-    
+
     file = request.files["image_input"]
     if not file.filename.endswith(".jpg"):
         flash("Wrong image type! (jpg images only)", "image_exception")
@@ -475,7 +494,7 @@ def add_image():
     users.update_image(user_id, image)
     flash("Profile picture was updated successfully!", "image_success")
     return redirect("/")
-    
+
 
 @app.route("/image/<int:user_id>")
 def show_image(user_id):
@@ -488,4 +507,3 @@ def show_image(user_id):
     response = make_response(bytes(image))
     response.headers.set("Content-Type", "image/jpeg")
     return response
-    

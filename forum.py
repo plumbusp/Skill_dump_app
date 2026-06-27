@@ -33,7 +33,8 @@ def add_thread(title, initial_message) -> int:
 
 
 def add_message(content, thread_id, user_id):
-    sql = "INSERT INTO messages (content, sent_at, user_id, thread_id) VALUES (?, datetime('now'), ?, ?)"
+    sql = """ INSERT INTO messages (content, sent_at, user_id, thread_id) 
+        VALUES (?, datetime('now'), ?, ?)"""
     db.execute(sql, [content, user_id, thread_id])
 
 
@@ -42,7 +43,7 @@ def get_messages(thread_id):
         FROM messages AS m
         JOIN log_in_info ON m.user_id = log_in_info.id
         WHERE m.thread_id = ?"""
-    
+
     return db.query(sql, [thread_id])
 
 def get_message(thread_id:int, message_id:int):
@@ -55,11 +56,11 @@ def get_message(thread_id:int, message_id:int):
 def update_message(thread_id:int, message_id:int, content:str):
     db.execute("""UPDATE messages SET content = ? 
         WHERE thread_id = ? AND id = ?""", [content, thread_id, message_id])
-    
+
 def delete_message(thread_id:int, message_id:int):
     db.execute("""DELETE FROM messages WHERE thread_id = ? AND id = ?""",
         [thread_id, message_id])
-    
+
 def find_matches(keyword: str):
     sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last
         FROM threads t, messages m
