@@ -20,6 +20,8 @@ body {
 }
 h1, h2{
   color: rgb(42, 41, 88); 
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 p, h3, h4{
   color: rgb(95, 99, 150); 
@@ -43,7 +45,6 @@ input[type=text]{
   font-family: StudyDaily;
   border-radius: 10px;
 }
-
 input[type=password]{
   margin: 0.25rem;
   font-family: StudyDaily;
@@ -51,6 +52,10 @@ input[type=password]{
 }
 textarea{
   resize: vertical;
+}
+textarea{
+  max-width: 100%;
+  max-height: 100vh;
 }
 select{
   margin: 0.25rem;
@@ -70,7 +75,6 @@ hr {
   justify-content: center;
   align-items: center;
 }
-
 .content_island{
   margin: 0.5rem;
   padding: 0.25rem;
@@ -105,3 +109,7 @@ hr {
   stroke-width: 2px;
   stroke: rgb(58, 145, 29);
 }
+.center-fit {
+  max-width: 100%;
+  max-height: 100vh;
+  }

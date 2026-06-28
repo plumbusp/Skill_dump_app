@@ -52,6 +52,7 @@ def check_csrf():
 @app.template_filter()
 def show_lines(content):
     content = str(markupsafe.escape(content))
+    content.rstrip()
     content = content.replace("\n", "<br />")
     return markupsafe.Markup(content)
 
@@ -111,13 +112,20 @@ def sign_up():
     password1 = request.form["password1"]
     password2 = request.form["password2"]
 
+    clean_username = username.strip()
+    if clean_username == "" or len(clean_username) > 40:
+        flash("The username cannot be empty or more than 40 characters!", "sign_up_exception")
+        return redirect(url_for("sign_up_page", username=username))
+
     if password1 != password2:
         flash("Passwords don't match!", "sign_up_exception")
         return redirect(url_for("sign_up_page", username=username))
-    if password1.strip() == "":
-        flash("A password cannot be empty!", "sign_up_exception")
+    
+    clean_password = password1.strip() 
+    if clean_password == "" or len(clean_password) > 20:
+        flash("A password cannot be empty or more than 20 characters!", "sign_up_exception")
         return redirect(url_for("sign_up_page", username=username))
-
+    
     password_hash = generate_password_hash(password1)
 
     try:
@@ -240,7 +248,7 @@ def add_idea():
         return redirect("/private_ideas")
 
 
-    private_ideas.add_private_idea(idea, content, type_of_skill)
+    private_ideas.add_private_idea(clean_idea, clean_content, type_of_skill)
     return redirect("/private_ideas")
 
 @app.route("/edit/<int:idea_id>", methods=["GET", "POST"])
@@ -269,6 +277,7 @@ def edit_idea(idea_id):
         check_csrf()
 
         new_title = request.form["edited_title"]
+        
         clean_new_title = new_title.strip()
         if len(clean_new_title) > 100 or len(clean_new_title) == 0:
             flash("The title cannot be empty or more than 100 char!", "new_idea_exception")
@@ -281,7 +290,7 @@ def edit_idea(idea_id):
             return redirect(f"/edit/{idea_id}")
     
         type_of_skill= request.form["edited_type_of_skill"]
-        private_ideas.update_idea(int(idea_id), new_content, new_title, type_of_skill)
+        private_ideas.update_idea(int(idea_id), clean_new_content, clean_new_title, type_of_skill)
         return redirect("/private_ideas")
 
     return "what is it then?? ERROR!"
@@ -331,7 +340,7 @@ def add_skill():
     skill = request.form["new_skill"]
     if len(skill.strip()) == 0 or len(skill.strip()) > 50:
         flash("Invalid skill input! The skill can't be empty or longer than 50 char.","skills")
-    passes = users.add_type_of_skill(session["user_id"], skill)
+    passes = users.add_type_of_skill(session["user_id"], skill.strip())
     if not passes:
         flash("The skill name is already taken!", "skills")
 
@@ -415,7 +424,7 @@ def add_message():
             flash("A message cannot be empty or more than 500 char!", "new_message_exception")
             return redirect(f"/thread/{thread_id}")
 
-        forum.add_message(message, thread_id, session["user_id"])
+        forum.add_message(clean_message, thread_id, session["user_id"])
         return redirect(f"/thread/{thread_id}")
     except: # catches internal server error,
         # if e.g. a user changed thread_id in page inspection to the unexisting one
@@ -451,7 +460,7 @@ def edit_message(thread_id:int, message_id: int):
             flash("A message cannot be empty or more than 500 char!", "new_message_exception")
             return redirect(f"/edit_message/{thread_id}/{message_id}")
         
-        forum.update_message(thread_id, message_id, new_contemt)
+        forum.update_message(thread_id, message_id, clean_new_message)
         return redirect(f"/thread/{thread_id}")
 
     return redirect(f"/thread/{thread_id}")

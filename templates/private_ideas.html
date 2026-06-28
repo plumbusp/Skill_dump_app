@@ -85,7 +85,7 @@
             {% endif %}
             <p class = "title">{{idea["title"]}}</p>
             <div class = "message_under_title">
-                <p>{{idea["content"]}}</p>
+                <p>{{idea["content"] | show_lines }}</p>
                 <p>
                     <a href="/edit/{{ idea.id }}">Edit</a> |
                     <a href="/delete/{{ idea.id }}">Delete</a>
