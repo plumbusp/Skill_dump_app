@@ -232,11 +232,11 @@ def add_idea():
     clean_content = content.strip()
 
     if len(clean_idea) > 100 or len(clean_idea) == 0:
-        flash("The title cannot be empty or more than 100 char!", "new_idea")
+        flash("The title cannot be empty or more than 100 char!", "new_idea_exception")
         return redirect("/private_ideas")
 
     if len(clean_content) > 1000 or len(clean_content) == 0:
-        flash("The content cannot be empty or more than 1000 char!", "new_idea")
+        flash("The content cannot be empty or more than 1000 char!", "new_idea_exception")
         return redirect("/private_ideas")
 
 
@@ -254,9 +254,12 @@ def edit_idea(idea_id):
     idea = private_ideas.get_idea(idea_id, session["user_id"])
     if not idea:
         abort(403)
+    try:
+        idea_id = int(idea_id)
+    except ValueError:
+        abort(403)
 
     user_skill_types = users.get_users_skills(session["user_id"])
-
     if request.method == "GET":
         return render_template("edit.html",
                             for_idea=True, for_message=False,
@@ -264,8 +267,19 @@ def edit_idea(idea_id):
 
     if request.method == "POST":
         check_csrf()
-        new_content = request.form["edited_content"]
+
         new_title = request.form["edited_title"]
+        clean_new_title = new_title.strip()
+        if len(clean_new_title) > 100 or len(clean_new_title) == 0:
+            flash("The title cannot be empty or more than 100 char!", "new_idea_exception")
+            return redirect(f"/edit/{idea_id}")
+    
+        new_content = request.form["edited_content"]
+        clean_new_content = new_content.strip()
+        if len(clean_new_content) > 1000 or len(clean_new_content) == 0:
+            flash("The content cannot be empty or more than 1000 char!", "new_idea_exception")
+            return redirect(f"/edit/{idea_id}")
+    
         type_of_skill= request.form["edited_type_of_skill"]
         private_ideas.update_idea(int(idea_id), new_content, new_title, type_of_skill)
         return redirect("/private_ideas")
@@ -412,6 +426,12 @@ def add_message():
 def edit_message(thread_id:int, message_id: int):
     require_log_in()
 
+    try:
+        thread_id = int(thread_id)
+        message_id = int(message_id)
+    except ValueError:
+        abort(403)
+        
     thread = forum.get_thread(thread_id)
     message = forum.get_message(thread_id, message_id)
 
@@ -426,6 +446,11 @@ def edit_message(thread_id:int, message_id: int):
     if request.method == "POST":
         check_csrf()
         new_contemt = request.form["content"]
+        clean_new_message = new_contemt.strip()
+        if len(clean_new_message) == 0 or len(clean_new_message) > 500:
+            flash("A message cannot be empty or more than 500 char!", "new_message_exception")
+            return redirect(f"/edit_message/{thread_id}/{message_id}")
+        
         forum.update_message(thread_id, message_id, new_contemt)
         return redirect(f"/thread/{thread_id}")
 

@@ -14,15 +14,24 @@
                 {% if skill.names == idea.type_of_skill %}
                     <option value="{{skill.names}}" selected>{{skill.names}}</option>
                 {% else %}
-                     <option value="{{skill.names}}">{{skill.names}}</option>
+                    <option value="{{skill.names}}">{{skill.names}}</option>
                 {% endif %}
             {% endfor %}
         </select><br>
         <p>Title:</p>
-        <input name="edited_title" value="{{ idea.title }}" /><br>
+        <input name="edited_title" maxlength="100" value="{{ idea.title }}" /><br>
         <p>Content:</p>
-        <textarea name="edited_content" rows="5" cols="40">{{ idea.content }}</textarea><br>
+        <textarea 
+          name="edited_content" rows="5" cols="40" maxlength="1000">{{ idea.content }}
+        </textarea><br>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        
+        {% for message in get_flashed_messages(category_filter=["new_idea_exception"]) %}
+          <p class = "exception_message">
+            {{ message }}
+          </p>
+        {% endfor %}
+
         <input type="submit" value="Submit" />
     </form>
     
@@ -30,9 +39,17 @@
     <form action="/edit_message/{{ thread.id }}/{{ message.id }}" method="post">
       <p>
         Message:<br />
-        <textarea name="content" rows="5" cols="40">{{ message.content }}</textarea>
+        <textarea
+          name="content" rows="5" cols="40" maxlength="500">{{ message.content }}
+        </textarea>
       </p>
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+
+      {% for message in get_flashed_messages(category_filter=["new_message_exception"]) %}
+        <p class = "exception_message">
+          {{ message }}
+        </p>
+      {% endfor %}
       <input type="submit" value="Submit!" />
     </form>
   {% endif %}
