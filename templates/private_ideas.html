@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="/static/main.css">
 </head>
 <body>
-    {% if session.username %}
+{% if session.username %}
     <div class = "top_bar">
       <a class = "top_bar_link" href="/">Home/Profile</a>
       <a class = "top_bar_link" href="/private_ideas">Private skills page</a>
@@ -15,92 +15,92 @@
     <h2>Your skills page:</h2>
     <h3>Here is your skills page. You can add your new skills here,
         and they will be visible only to you. </h3>
-
-        <form action="/add_skill_type" method="POST" class="content_island">
-            <label for="new_skill">Add new type of skill (reloads the page):</label><br>
-            <input name = "new_skill" type="text" maxlength="50"><br>
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <button>Add</button> <br>
-            {% for message in get_flashed_messages(category_filter=["skills"]) %}
+    <hr>
+    <h3>Add new type of skill (reloads the page):</h3>
+    <form action="/add_skill_type" method="POST" class="content_island">
+        <label for="new_skill">Skill type</label><br>
+        <input name = "new_skill" type="text" maxlength="50"><br>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <button>Save</button> <br>
+        {% for message in get_flashed_messages(category_filter=["skills"]) %}
             <p class = "exception_message">
                 {{ message }}
             </p>
+        {% endfor %}
+    </form>
+    <hr>
+    <h3>Add a new skill:</h3>
+    <form action="/add_private_idea" method="POST" class="content_island">
+        <label for="type_of_skill">Type of skill:</label><br>
+        <select name="type_of_skill">
+            <option value="None">None</option>
+            {% for skill in user_skill_types %}
+                <option value="{{skill.names}}">{{skill.names}}</option>
             {% endfor %}
-        </form>
+        </select><br>
 
-        <h4>Add a new skill:</h4>
-        <form action="/add_private_idea" method="POST" class="content_island">
-            <label for="type_of_skill">Type of skill:</label><br>
-            <select name="type_of_skill">
-                <option value="None">None</option>
-                {% for skill in user_skill_types %}
-                    <option value="{{skill.names}}">{{skill.names}}</option>
-                {% endfor %}
-            </select><br>
+        <label for="idea">Title of a skill:</label><br>
+        <input type="text" name="idea" maxlength="100"><br>
 
-            <label for="idea">Title of a skill:</label><br>
-            <input type="text" name="idea" maxlength="100"><br>
-
-            <label for = "content">What have you learned?:</label><br>
-            <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <button>Add a skill</button> <br>
-            {% for message in get_flashed_messages(category_filter=["new_idea"]) %}
+        <label for = "content">What have you learned?:</label><br>
+        <textarea rows="4" cols="40" name="content" maxlength="1000"></textarea><br>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <button>Add a skill</button> <br>
+        {% for message in get_flashed_messages(category_filter=["new_idea"]) %}
             <p class = "exception_message">
                 {{ message }}
             </p>
-            {% endfor %}
-        </form>
-        
-        <form action="/search_private_ideas" method="GET" class ="content_island">
-            <label for = "keyword">Search your skills:</label><br>
-            <input type="text" name="search_keyword" maxlength="100" {% if search_keyword %} value = {{search_keyword}} {% endif %}><br>
+        {% endfor %}
+    </form>
+    <hr>
+    <form action="/search_private_ideas" method="GET" class ="content_island">
+        <label for = "keyword">Search your skills:</label><br>
+        <input type="text" name="search_keyword" maxlength="100" {% if search_keyword %} value = {{search_keyword}} {% endif %}><br>
   
-            <label for = "search_skill_type">Display your skills by type:</label><br>
-            <select name="search_skill_type">
-                <option value="All" {% if not search_skill_type %} selected {% endif %}>All</option>
-                <option value="None">None</option>
-                {% for skill in user_skill_types %}
-                    <option value="{{skill.names}}" 
-                    {% if search_skill_type == skill.names %}
-                         selected 
-                    {% endif %} > {{skill.names}}</option>
-                {% endfor %}
-            </select><br>
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <label for = "search_skill_type">Display your skills by type:</label><br>
+        <select name="search_skill_type">
+            <option value="All" {% if not search_skill_type %} selected {% endif %}>All</option>
+            <option value="None">None</option>
+            {% for skill in user_skill_types %}
+                <option value="{{skill.names}}" 
+                {% if search_skill_type == skill.names %}
+                     selected 
+                {% endif %} > {{skill.names}}</option>
+            {% endfor %}
+        </select><br>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <button>Search</button> <br>
                 {% for message in get_flashed_messages(category_filter=["private_ideas_search_exception"]) %}
                     <p class = "exception_message">
                         {{ message }}   
                     </p>
                 {% endfor %}
-        </form>
-
-        <h3>Here are your skills:</h3>
-        {% for idea in ideas %}
-            <div class="content_island">
-                {% if idea.type_of_skill != "" or idea.type_of_skill != "None" %}
-                    <p>Type of skill: <span class="accent_text">{{idea.type_of_skill}}</span></p>
-                {% endif %}
-                <p class = "title">{{idea["title"]}}</p>
-                <div class = "message_under_title">
-                    <p>{{idea["content"]}}</p>
-                    <p>
-                        <a href="/edit/{{ idea.id }}">Edit</a> |
-                        <a href="/delete/{{ idea.id }}">Delete</a>
-                    </p>
-                </div>
+    </form>
+    <hr>
+    <h3>Here are your skills:</h3>
+    {% for idea in ideas %}
+        <div class="content_island">
+            {% if idea.type_of_skill != "" or idea.type_of_skill != "None" %}
+                <p>Type of skill: <span class="accent_text">{{idea.type_of_skill}}</span></p>
+            {% endif %}
+            <p class = "title">{{idea["title"]}}</p>
+            <div class = "message_under_title">
+                <p>{{idea["content"]}}</p>
+                <p>
+                    <a href="/edit/{{ idea.id }}">Edit</a> |
+                    <a href="/delete/{{ idea.id }}">Delete</a>
+                </p>
             </div>
-        {% endfor %}
-        <p>
-            <a href="{{ url_for('show_private_ideas', page=page-1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&lt;&lt;</a>
-                Page {{page}}/{{page_count}}
-            <a href="{{ url_for('show_private_ideas', page=page+1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&gt;&gt;</a>
-        </p>
+        </div>
+    {% endfor %}
+    <p>
+        <a href="{{ url_for('show_private_ideas', page=page-1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&lt;&lt;</a>
+            Page {{page}}/{{page_count}}
+        <a href="{{ url_for('show_private_ideas', page=page+1, search_keyword=search_keyword, search_skill_type=search_skill_type) }}">&gt;&gt;</a>
     </p>
-    {% else %}
-        <p>You are not logged in! Please log in to see your skills.</p>
-    {% endif %}
+{% else %}
+    <p>You are not logged in! Please log in to see your skills.</p>
+{% endif %}
 </body>
 </html>
 

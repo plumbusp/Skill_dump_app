@@ -16,7 +16,7 @@
     {% endif %}
 
         <h1> Thread: {{thread.title}}</h1>
-
+        <hr>
     {% if session.username %}
         <p> Add a new message: </p>
         <form action="/new_message" method="post">
@@ -30,16 +30,15 @@
             {% endfor %}
             <button>Submit!</button>
         </form>
-        <hr />
+        <hr>
     {% else %}
         <p>You are not logged in! Please <a href="/">log in</a> to send a message to the thread.</p>
-
     {% endif %}
     {% for message in messages %}
         <div class="content_island">
             <a href="/user/{{message.user_id}}">{{message.username}}</a>
-            <div class="content_island">
-                <p>({{ message.sent_at }}):</p>
+            <br> <span class="date">({{ message.sent_at }}):</span>
+            <div class="message_island">
                 <p>
                     {{ message.content | show_lines}}
                 </p>

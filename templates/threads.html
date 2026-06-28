@@ -15,7 +15,7 @@
         </div>
     {% endif %}
         
-        <h1> Threads </h1>
+    <h1> Threads </h1>
     {% if session.username %}
         <form action="/create_thread" method="post"> 
             <h4>Create a new thread:</h4>
@@ -29,10 +29,7 @@
                 <button>Create thread</button>
             </div>
         </form>
-    {% else %}
-        <p>You are not logged in! Please <a href="/">log in</a> to create a thread.</p>
-    {% endif %}
-        
+        <hr>
         <form action="/search_threads" method="GET">
             <div class="content_island">
                 <label for = "search">Search threads:</label><br>
@@ -45,11 +42,15 @@
                 <button>Search</button> <br>
             </div>
         </form>
-
+        <hr>
+    {% else %}
+        <p>You are not logged in! <br>
+            Please <a href="/">log in</a> to create thread or search threads.</p>
+            <hr>
+    {% endif %}
         {% for thread in threads%}
             <a href="/thread/{{thread.id}}"><b>{{thread.title}}</b></a>
             <p> There are total of {{thread.total}} messages in this thread.</p>
-            <hr />
         {% endfor %}
         <p> <a href= "/threads/{{page-1}}">
             &lt &lt</a> Page {{page}}/{{page_count}} 
