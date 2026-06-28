@@ -12,7 +12,7 @@ Do you learn something new every day, but forget what you have learned with time
 - Check other user's profiles and see their profile picture and last thread sent messages.
 
 ## Technical notes on the app:
-- The developer tried their best to consider security risks, for example SQL or XSS injections. CSRF token against CSRF attacks is implemented. The 'next_page' logic contains a certain security risk, as it relies on user input for redirection and should be validated against a whitelist of allowed pages.
+- The developer tried their best to consider security risks, for example SQL or XSS injections. CSRF token against CSRF attacks is implemented.
 - private_ideas.py serves as a module for dealing with all private skills related matters.
 - App supports large amounts of data in threads without lagging. The report is written to the **big_data_amount_report.md** file.
 - The developer used Pylint tool and made a report on it's messages. The report is written to the **pylint-report.md** file.
