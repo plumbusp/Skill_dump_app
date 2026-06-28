@@ -32,8 +32,8 @@
         <hr>
         <form action="/search_threads" method="GET">
             <div class="content_island">
-                <label for = "search">Search threads:</label><br>
-                <input type="text" name="keyword" maxlength="100"><br>
+                <label for = "search_keyword">Search threads:</label><br>
+                <input type="text" name="search_keyword" maxlength="100" {% if search_keyword %} value = {{search_keyword}} {% endif %}><br>
                 {% for message in get_flashed_messages(category_filter=["thread_search_exception"]) %}
                     <p class = "exception_message">
                         {{ message }}
@@ -52,9 +52,9 @@
             <a href="/thread/{{thread.id}}"><b>{{thread.title}}</b></a>
             <p> There are total of {{thread.total}} messages in this thread.</p>
         {% endfor %}
-        <p> <a href= "/threads/{{page-1}}">
+        <p> <a href= "{{url_for('show_threads', page=page-1, search_keyword=search_keyword)}}">
             &lt &lt</a> Page {{page}}/{{page_count}} 
-            <a href= "/threads/{{page+1}}"> &gt &gt</a>
+            <a href= "{{url_for('show_threads', page=page+1, search_keyword=search_keyword)}}"> &gt &gt</a>
         </p>
 </body>
 </html>

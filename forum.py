@@ -3,20 +3,38 @@ from flask import session
 import db
 
 
-def get_threads(page, page_size):
-    sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last
+def get_threads(page, page_size, search_keyword):
+    limit = page_size
+    offset = page_size * (page - 1)
+
+    if search_keyword:
+        params = [f"%{search_keyword}%", limit, offset]
+        sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last
+            FROM threads t, messages m
+            WHERE t.id = m.thread_id AND t.title LIKE ?
+            GROUP BY t.id
+            ORDER BY t.id DESC
+            LIMIT ? OFFSET ?"""
+    else:
+        params = [limit, offset]
+        sql = """SELECT t.id, t.title, COUNT(m.id) total, MAX(m.sent_at) last
             FROM threads t, messages m
             WHERE t.id = m.thread_id
             GROUP BY t.id
             ORDER BY t.id DESC
             LIMIT ? OFFSET ?"""
-    limit = page_size
-    offset = page_size * (page - 1)
-    return db.query(sql, [limit, offset])
 
-def thread_count() -> int:
-    sql = """SELECT COUNT(id) AS count FROM threads"""
-    return db.query_one(sql)["count"]
+    return db.query(sql, params)
+
+
+def thread_count(search_keyword) -> int:
+    params = []
+    if search_keyword:
+        sql = """SELECT COUNT(id) AS count FROM threads WHERE title LIKE ?"""
+        params.append(f"%{search_keyword}%")
+    else:
+        sql = """SELECT COUNT(id) AS count FROM threads"""
+    return db.query_one(sql,params)["count"]
 
 def get_thread(thread_id):
     sql = """SELECT t.id, t.title, t.user_id FROM threads AS t WHERE id = ?"""

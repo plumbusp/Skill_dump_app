@@ -21,7 +21,7 @@ db.create_app_tables()
 
 app.secret_key = config.initialize_secret_key()
 
-PAGE_SIZE = 10
+PAGE_SIZE = 3
 
 #### TIME MEASUREMENTS ####
 @app.before_request
@@ -227,6 +227,17 @@ def show_private_ideas(page=1):
                         page=page, page_count=page_count, ideas=ideas,
                         user_skill_types=user_skill_types)
 
+@app.route("/search_private_ideas", methods =["GET"])
+def search_private_ideas():
+    require_log_in()
+
+    keyword = request.args.get("search_keyword") or None
+    skill_type = request.args.get("search_skill_type") or None
+
+    return redirect(url_for("show_private_ideas",
+                        search_keyword= keyword, search_skill_type=skill_type))
+
+
 @app.route("/add_private_idea", methods=["POST"])
 def add_idea():
     require_log_in()
@@ -320,16 +331,6 @@ def delete_idea(idea_id):
 
     return "what is it then?? ERROR!"
 
-@app.route("/search_private_ideas", methods =["GET"])
-def search_private_ideas():
-    require_log_in()
-
-    keyword = request.args.get("search_keyword") or None
-    skill_type = request.args.get("search_skill_type") or None
-
-    return redirect(url_for("show_private_ideas",
-                        search_keyword= keyword, search_skill_type=skill_type))
-
 
 #### SKILLS ####
 @app.route("/add_skill_type", methods =["POST"])
@@ -348,28 +349,34 @@ def add_skill():
 
 
 #### THREADS (PUBLIC) ####
-
 @app.route("/threads", methods = ["GET"])
 @app.route("/threads/<int:page>", methods = ["GET"])
 def show_threads(page=1):
     # Log in status is handled inside the html file
-    thread_count = forum.thread_count()
+    search_keyword = request.args.get("search_keyword") or None
+    if search_keyword and search_keyword.strip() == "":
+        search_keyword = None
+
+    thread_count = forum.thread_count(search_keyword)
+    if thread_count == 0:
+        flash("There is no entries that satisfy given search parameters",
+            "threads_search_exception")
 
     page_count = math.ceil(thread_count/PAGE_SIZE)
     page = page_validity_helper(page, page_count)
 
-    threads = forum.get_threads(page, PAGE_SIZE)
-    return render_template("threads.html", threads=threads, page=page, page_count=page_count)
+    threads = forum.get_threads(page, PAGE_SIZE, search_keyword)
+    return render_template("threads.html", threads=threads, page=page, page_count=page_count, search_keyword=search_keyword)
 
 @app.route("/search_threads", methods =["GET"])
 def search_threads():
     require_log_in()
-    keyword =request.args.get("keyword")
-    if not keyword:
-        return redirect("/threads")
 
-    matches = forum.find_matches(keyword)
-    return render_template("threads.html", threads=matches)
+    search_keyword = request.args.get("search_keyword") or None
+    if search_keyword and search_keyword.strip == "":
+        search_keyword = None
+
+    return redirect(url_for("show_threads", search_keyword=search_keyword))
 
 
 @app.route("/thread/<int:thread_id>")

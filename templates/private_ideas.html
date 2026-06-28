@@ -69,12 +69,12 @@
             {% endfor %}
         </select><br>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <button>Search</button> <br>
-                {% for message in get_flashed_messages(category_filter=["private_ideas_search_exception"]) %}
-                    <p class = "exception_message">
-                        {{ message }}   
-                    </p>
-                {% endfor %}
+        <button>Search</button> <br>
+            {% for message in get_flashed_messages(category_filter=["private_ideas_search_exception"]) %}
+                <p class = "exception_message">
+                    {{ message }}   
+                </p>
+            {% endfor %}
     </form>
     <hr>
     <h3>Here are your skills:</h3>
